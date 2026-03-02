@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 
 from src.scheduler.scheduler import Scheduler
 from src.models.movie import Movie
@@ -21,61 +21,80 @@ def main() -> None:
 
     sched = Scheduler()
 
-    # OPTIONAL: try to load schedule, but don't crash if schedule.json is old/bad
+    # Try loading prior schedule
     try:
         sched.load_schedule("schedule.json")
         print("Loaded schedule.json")
     except Exception as e:
         print(f"(Skipping load) schedule.json not usable yet: {e}")
 
-    # ---- Manager: add movies (manual entry) ----
-    print("\n--- Manager: Add a Movie ---")
+    # ---- Manager picks theater location ----
+    print("\n--- Manager: Pick Theater Location ---")
+    print("1) Location 1")
+    location = input("Pick location (1): ").strip() or "1"
+    if location != "1":
+        print("Only Location 1 is available right now. Using Location 1.")
+    print("Using Location 1.")
 
-    add_more = input("Would you like to add a movie? (y/n): ")
+    today = date.today()
 
-    while add_more.lower() == "y":
-        title = input("Enter movie title: ")
-        duration = int(input("Enter duration (minutes): "))
-        rating = input("Enter rating (PG, PG-13, etc): ")
+    # ---- Manager assigns one movie per room per day ----
+    print("\n--- Manager: Assign Movie to Room (All Day) ---")
 
-        new_movie = Movie(title, duration, rating)
-        sched.add_movie(new_movie)
+    while True:
+        room_num = input("\nEnter room # (or type 'done'): ").strip().lower()
+        if room_num == "done":
+            break
+        if not room_num.isdigit():
+            print("Please enter a number like 1, 2, 3... or 'done'.")
+            continue
 
-        print(f"Movie '{title}' added successfully!")
+        auditorium = f"Auditorium {room_num}"
 
-        add_more = input("Add another movie? (y/n): ")
+        title = input("Enter movie name: ").strip()
+        length = int(input("Enter movie length (minutes): ").strip())
 
-    # ---- Demo movies (so showtimes always work even if user adds none) ----
-    minecraft = Movie("A Minecraft Movie", 105, "PG")
-    lilo_stitch = Movie("Lilo & Stitch", 100, "PG")
-    superman = Movie("Superman", 140, "PG-13")
-    zootopia_2 = Movie("Zootopia 2", 110, "PG")
-    avatar_fire_ash = Movie("Avatar: Fire and Ash", 190, "PG-13")
+        # rating isn't in your new requirement, but your print shows rating
+        rating = input("Enter rating (optional, press Enter for NR): ").strip() or "NR"
 
-    for m in [minecraft, lilo_stitch, superman, zootopia_2, avatar_fire_ash]:
-        sched.add_movie(m)
+        # Enforce rule: one movie per room per day
+        if not sched.enforce_one_movie_per_room_per_day(today, auditorium, title):
+            print(f"❌ {auditorium} already has a different movie scheduled today.")
+            continue
 
-    # ---- Schedule showtimes (realistic times) ----
-    sched.add_showtime(Showtime(minecraft, datetime(2026, 7, 10, 10, 0), "Auditorium 1", capacity=75))
-    sched.add_showtime(Showtime(lilo_stitch, datetime(2026, 7, 10, 12, 15), "Auditorium 1", capacity=75))
-    sched.add_showtime(Showtime(superman, datetime(2026, 7, 10, 14, 30), "Auditorium 1", capacity=75))
-    sched.add_showtime(Showtime(zootopia_2, datetime(2026, 7, 10, 16, 50), "Auditorium 1", capacity=75))
-    sched.add_showtime(Showtime(avatar_fire_ash, datetime(2026, 7, 10, 19, 15), "Auditorium 1", capacity=75))
+        movie = Movie(title, length, rating)
+        sched.add_movie(movie)
 
-    ok = sched.add_showtime(
-        Showtime(minecraft, datetime(2026, 7, 10, 10, 30), "Auditorium 1", capacity=75)
-    )
-    print("Overlap test (should be False):", ok)
+        # Generate dynamic options 1-5 based on length (+ buffer)
+        options = sched.generate_time_options(today, length, day_start_hhmm="10:00", buffer_min=15, count=5)
 
-    # ---- Customer views schedule ----
-    print_schedule(sched.get_schedule())
+        print("\nPick options 1-5 for showtimes (auto-generated from movie length):")
+        for opt in options:
+            print(f"{opt.option_num}) {opt.start_time.strftime('%I:%M %p')} - {opt.end_time.strftime('%I:%M %p')}")
 
-    # ---- Prevent overselling demo ----
-    first = sched.get_schedule()[0]
-    print("\n--- Oversell Test ---")
-    print("Sell 50 tickets:", "OK" if first.sell_ticket(50) else "SOLD OUT")
-    print("Sell 1 more:", "OK" if first.sell_ticket(1) else "NOT Available (would oversell)")
+        picks_raw = input("Enter picks like 1,3,5 (or press Enter to skip): ").strip()
+        if not picks_raw:
+            print("Skipping this room (no times chosen).")
+            continue
 
+        picks = [p.strip() for p in picks_raw.split(",") if p.strip()]
+        for p in picks:
+            if not p.isdigit():
+                print(f"⚠️ Skipping invalid pick: {p}")
+                continue
+            n = int(p)
+            match = next((o for o in options if o.option_num == n), None)
+            if not match:
+                print(f"⚠️ Pick out of range (1-5): {p}")
+                continue
+
+            ok = sched.add_showtime(Showtime(movie, match.start_time, auditorium, capacity=75))
+            if not ok:
+                print(f"❌ Overlap blocked in {auditorium} at {match.start_time.strftime('%I:%M %p')}")
+            else:
+                print(f"✅ Added {auditorium}: {match.start_time.strftime('%I:%M %p')} ({title})")
+
+    # ---- Print final schedule ----
     print_schedule(sched.get_schedule())
 
     # ---- Save schedule ----

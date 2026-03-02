@@ -1,98 +1,137 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
-from datetime import datetime, timedelta
+from dataclasses import dataclass
+from datetime import datetime, timedelta, date
+from typing import Dict, List, Optional
 
 from src.models.movie import Movie
 from src.models.showtime import Showtime
 
 
+@dataclass(frozen=True)
+class TimeOption:
+    option_num: int
+    start_time: datetime
+    end_time: datetime
+
+
 class Scheduler:
-    def __init__(self):
-        self.movies: list[Movie] = []
-        self.showtimes: list[Showtime] = []
+    """
+    One-theater scheduling logic.
 
-    def add_movie(self, movie: Movie):
-        self.movies.append(movie)
+    - Prevents overlapping showtimes per auditorium/room.
+    - Can generate 5 time options based on movie length (+ buffer).
+    - Saves/loads schedule.json
+    """
 
-    def _end_time(self, s: Showtime) -> datetime:
-        # Movie end = start + duration
-        return s.start_time + timedelta(minutes=s.movie.duration_min)
+    def __init__(self) -> None:
+        self._movies: List[Movie] = []
+        self._showtimes: List[Showtime] = []
 
-    def _overlaps(self, a: Showtime, b: Showtime) -> bool:
-        # Only block overlaps in the SAME auditorium
-        if a.auditorium != b.auditorium:
-            return False
+    # ---------- Basic getters ----------
+    def add_movie(self, movie: Movie) -> None:
+        self._movies.append(movie)
 
-        a_start, a_end = a.start_time, self._end_time(a)
-        b_start, b_end = b.start_time, self._end_time(b)
+    def get_schedule(self) -> list[Showtime]:
+        return sorted(self._showtimes, key=lambda s: (s.auditorium, s.start_time))
 
-        # Overlap rule: start before other ends AND end after other starts
-        return a_start < b_end and a_end > b_start
+    # ---------- Overlap rules ----------
+    @staticmethod
+    def _overlaps(a: Showtime, b: Showtime) -> bool:
+        # touching is allowed: end == start is NOT overlap
+        return a.start_time < b.end_time and b.start_time < a.end_time
 
     def add_showtime(self, showtime: Showtime) -> bool:
-        new_start = showtime.start_time
-        new_end = showtime.end_time
-
-        for existing in self.showtimes:
-            # Only block overlap in the SAME auditorium (single theater logic)
-            if existing.auditorium != showtime.auditorium:
-                continue
-
-            existing_start = existing.start_time
-            existing_end = existing.end_time
-
-            # Overlap rule: (start < other_end) AND (other_start < end)
-            overlaps = (new_start < existing_end) and (existing_start < new_end)
-            if overlaps:
+        """Returns True if added, False if blocked due to overlap in same auditorium."""
+        for existing in self._showtimes:
+            if existing.auditorium == showtime.auditorium and self._overlaps(existing, showtime):
                 return False
-
-        self.showtimes.append(showtime)
+        self._showtimes.append(showtime)
         return True
-    def get_schedule(self):
-        return sorted(self.showtimes, key=lambda s: s.start_time)
+
+    # ---------- Manager workflow helpers ----------
+    def generate_time_options(
+        self,
+        day: date,
+        movie_duration_min: int,
+        *,
+        day_start_hhmm: str = "10:00",
+        buffer_min: int = 15,
+        count: int = 5,
+    ) -> list[TimeOption]:
+        """
+        Generates options 1..count.
+        Each option start time steps forward by (duration + buffer).
+        """
+        first_start = datetime.strptime(f"{day.isoformat()} {day_start_hhmm}", "%Y-%m-%d %H:%M")
+        step = timedelta(minutes=movie_duration_min + buffer_min)
+
+        options: list[TimeOption] = []
+        current = first_start
+        for i in range(1, count + 1):
+            end = current + timedelta(minutes=movie_duration_min)
+            options.append(TimeOption(i, current, end))
+            current = current + step
+        return options
+
+    def enforce_one_movie_per_room_per_day(
+        self,
+        day: date,
+        auditorium: str,
+        movie_title: str,
+    ) -> bool:
+        """
+        True if allowed, False if room already has a different movie that day.
+        """
+        for s in self._showtimes:
+            if s.auditorium == auditorium and s.start_time.date() == day:
+                if s.movie.title != movie_title:
+                    return False
+        return True
 
     # ---------- Save / Load ----------
-    def save_schedule(self, filepath: str = "schedule.json") -> None:
+    def save_schedule(self, filename: str) -> None:
         data = []
-        for s in self.get_schedule():
+        for s in self._showtimes:
             data.append(
                 {
-                    "title": s.movie.title,
-                    "rating": s.movie.rating,
-                    "duration_min": s.movie.duration_min,
-                    "start_time": s.start_time.isoformat(),
                     "auditorium": s.auditorium,
-                    "capacity": s.capacity,
-                    "tickets_sold": getattr(s, "tickets_sold", 0),
+                    "capacity": getattr(s, "capacity", None),  # if your Showtime stores it
+                    "start_time": s.start_time.isoformat(),
+                    "movie": {
+                        "title": s.movie.title,
+                        "duration_min": s.movie.duration_min,
+                        "rating": s.movie.rating,
+                    },
                 }
             )
-        Path(filepath).write_text(json.dumps(data, indent=2), encoding="utf-8")
+        with open(filename, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
 
-    def load_schedule(self, filepath: str = "schedule.json") -> None:
-        path = Path(filepath)
-        if not path.exists():
-            return
+    def load_schedule(self, filename: str) -> None:
+        with open(filename, "r", encoding="utf-8") as f:
+            data = json.load(f)
 
-        raw = json.loads(path.read_text(encoding="utf-8"))
-        self.showtimes = []
+        self._showtimes.clear()
+        self._movies.clear()
 
-        for item in raw:
-            movie = Movie(item["title"], item["duration_min"], item["rating"])
+        # reuse movie objects by title to avoid duplicates
+        movie_by_title: Dict[str, Movie] = {}
 
-            # keep movies list updated (avoid duplicates by title)
-            if not any(m.title == movie.title for m in self.movies):
-                self.movies.append(movie)
+        for item in data:
+            m = item["movie"]
+            title = m["title"]
+            duration = int(m["duration_min"])
+            rating = m.get("rating", "NR")
 
-            st = Showtime(
-                movie,
-                datetime.fromisoformat(item["start_time"]),
-                item["auditorium"],
-                capacity=item["capacity"],
-            )
+            if title not in movie_by_title:
+                movie_by_title[title] = Movie(title, duration, rating)
+                self.add_movie(movie_by_title[title])
 
-            if hasattr(st, "tickets_sold"):
-                st.tickets_sold = item.get("tickets_sold", 0)
+            movie_obj = movie_by_title[title]
+            start_time = datetime.fromisoformat(item["start_time"])
+            auditorium = item["auditorium"]
+            capacity = item.get("capacity", 75) or 75
 
-            self.showtimes.append(st)
+            self._showtimes.append(Showtime(movie_obj, start_time, auditorium, capacity=capacity))
