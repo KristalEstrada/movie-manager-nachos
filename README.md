@@ -21,3 +21,89 @@ To ensure smooth collaboration, the team will follow this branching strategy:
 6. After review, the PR is merged  
 
 This workflow ensures all team members can safely contribute and merge code.
+## Deployment & Installation Guide
+
+### Prerequisites
+
+Ensure the following are installed on your system:
+
+- Python 3.10 or higher
+- Git
+- pip (Python package manager)
+
+Verify installations:
+
+```bash
+python --version
+git --version
+```
+
+---
+
+### Step 1: Clone the Repository
+
+```bash
+git clone https://github.com/KristalEstrada/movie-manager-nachos.git
+cd movie-manager-nachos
+```
+
+---
+
+### Step 2: Switch to the Dev Branch
+
+```bash
+git checkout dev
+```
+
+---
+
+### Step 3: Create and Activate a Virtual Environment
+
+Mac/Linux:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+Windows:
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+```
+
+---
+
+### Step 4: Install Dependencies
+
+If the project includes a `requirements.txt` file:
+
+```bash
+pip install -r requirements.txt
+```
+
+If no external libraries are required, this project uses Python standard libraries only.
+
+---
+
+### Step 5: Run the Application
+
+```bash
+python main.py
+```
+
+(Adjust the filename if the main entry point changes.)
+
+---
+
+### Expected Result
+
+The Movie Manager system will launch in the terminal.  
+Users will be able to schedule and manage movie showtimes through the command-line interface.
+
+---
+
+### Repeatable Deployment
+
+Following the steps above provides a consistent and repeatable deployment method. Any system meeting the prerequisites can install and run the application successfully.
