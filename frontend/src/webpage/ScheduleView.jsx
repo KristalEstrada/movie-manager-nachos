@@ -15,6 +15,8 @@ function ShowtimeCard({ showtime, onTicketSold }) {
 
   const pct = Math.round((showtime.tickets_sold / showtime.capacity) * 100)
 
+  const canSell = showtime.canSell;
+
   async function handleSell() {
     setLoading(true)
     setMsg(null)
@@ -55,7 +57,7 @@ function ShowtimeCard({ showtime, onTicketSold }) {
       </div>
 
       {/* Sell ticket */}
-      {showtime.seats_left > 0 && (
+      {canSell && showtime.seats_left > 0 ? (
         <div style={styles.sellRow}>
           <input
             type="number"
@@ -69,6 +71,8 @@ function ShowtimeCard({ showtime, onTicketSold }) {
             {loading ? '…' : '🎟 Sell Ticket'}
           </button>
         </div>
+      ) : (
+        !canSell && <div style={{ color: '#7a7a7a', fontSize: 12, marginTop: 8 }}>Customer view: ticket sales are disabled.</div>
       )}
 
       {msg && (
@@ -80,7 +84,7 @@ function ShowtimeCard({ showtime, onTicketSold }) {
   )
 }
 
-export default function ScheduleView({ showtimes, onRefresh }) {
+export default function ScheduleView({ showtimes, onRefresh, canSell = true }) {
   if (!showtimes.length) {
     return (
       <div style={styles.empty}>

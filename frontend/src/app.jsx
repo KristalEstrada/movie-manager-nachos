@@ -3,7 +3,12 @@ import { getSchedule } from './api/schedulerApi'
 import AddShowtimePanel from './webpage/AddShowTimePanel'
 import ScheduleView from './webpage/ScheduleView'
 
+const MANAGER_PASSWORD = 'nachos-123'
+
 export default function App() {
+  const [role, setRole] = useState(null) // null | 'customer' | 'manager'
+  const [managerPass, setManagerPass] = useState('')
+  const [authError, setAuthError] = useState('')
   const [showtimes, setShowtimes] = useState([])
   const [status, setStatus]       = useState(null)   // { msg, type }
   const [loadingInit, setLoadingInit] = useState(true)
@@ -46,52 +51,70 @@ function handleClear() {
 }
  
 
+  function managerLogin() {
+    if (managerPass === MANAGER_PASSWORD) {
+      setRole('manager')
+      setAuthError('')
+    } else {
+      setAuthError('Incorrect manager password')
+    }
+  }
+
+  if (!role) {
+    return (
+      <div style={{ ...styles.root, justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+        <div style={styles.authCard}>
+          <h2 style={{ marginBottom: 14 }}>Choose Access Mode</h2>
+          <button style={styles.authButton} onClick={() => setRole('customer')}>👥 Customer view</button>
+          <div style={{ margin: '16px 0', textAlign: 'center' }}>or</div>
+          <input
+            type="password"
+            placeholder="Manager password"
+            value={managerPass}
+            onChange={(e) => setManagerPass(e.target.value)}
+            style={styles.authInput}
+          />
+          <button style={styles.authButton} onClick={managerLogin}>🛠 Manager login</button>
+          {authError && <div className="tag error" style={{ marginTop: 10 }}>{authError}</div>}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div style={styles.root}>
-      {/* ── Top bar ── */}
       <header style={styles.header}>
         <div style={styles.logo}>
           <span style={styles.logoIcon}>🍿</span>
           <div>
             <div style={styles.logoTitle}>Nachos Movie Manager</div>
-            <div style={styles.logoSub}>by Nachos · Location 1</div>
+            <div style={styles.logoSub}>{role === 'manager' ? 'Manager mode' : 'Customer mode'}</div>
           </div>
         </div>
-
         <div style={styles.headerActions}>
-          {status && (
-            <span className={`tag ${status.type === 'error' ? 'error' : 'success'}`} style={{ fontSize: 13, padding: '5px 10px' }}>
-              {status.msg}
-            </span>
-          )}
-          <button onClick={handleLoad} style={styles.btnOutline}>📂 Load</button>
-          <button onClick={handleSave} style={styles.btnOutline}>💾 Save</button>
-          <button onClick={handleClear} style={styles.btnDanger}>🗑 Clear</button>
+          <button onClick={() => setRole(null)} style={styles.btnOutline}>↩ Switch role</button>
+          <button onClick={refreshSchedule} style={styles.btnOutline}>↻ Refresh</button>
+          {role === 'manager' && <button onClick={handleClear} style={styles.btnDanger}>🗑 Clear</button>}
         </div>
       </header>
 
-      {/* ── Main layout ── */}
       <div style={styles.body}>
-        {/* Left sidebar: add form */}
-        <AddShowtimePanel onAdded={refreshSchedule} />
+        {role === 'manager' && <AddShowtimePanel onAdded={refreshSchedule} />}
 
-        {/* Right: schedule */}
         <main style={styles.main}>
           <div style={styles.mainHeader}>
             <div>
-              <h1 style={styles.mainTitle}>TODAY'S SCHEDULE</h1>
+              <h1 style={styles.mainTitle}>{role === 'manager' ? "MANAGER SCHEDULE" : "TODAY'S SHOWTIMES"}</h1>
               <p style={styles.mainSub}>
                 {showtimes.length} showtime{showtimes.length !== 1 ? 's' : ''} ·{' '}
                 {[...new Set(showtimes.map((s) => s.auditorium))].length} auditorium(s)
               </p>
             </div>
-            <button onClick={refreshSchedule} style={styles.refreshBtn}>↻ Refresh</button>
           </div>
-
           {loadingInit ? (
             <div style={styles.loading}>Loading schedule…</div>
           ) : (
-            <ScheduleView showtimes={showtimes} onRefresh={refreshSchedule} />
+            <ScheduleView showtimes={showtimes} onRefresh={refreshSchedule} canSell={role === 'manager'} />
           )}
         </main>
       </div>
@@ -167,4 +190,34 @@ const styles = {
     borderRadius: 6,
   },
   loading: { color: '#7a7a7a', padding: '40px 0', textAlign: 'center' },
+  authCard: {
+    width: 320,
+    background: '#111',
+    border: '1px solid #2a2a2a',
+    borderRadius: 10,
+    padding: 20,
+    boxShadow: '0 10px 20px rgba(0,0,0,0.4)',
+    textAlign: 'center',
+  },
+  authButton: {
+    width: '100%',
+    padding: '10px 12px',
+    margin: '6px 0',
+    fontSize: 14,
+    borderRadius: 6,
+    border: '1px solid #2a2a2a',
+    background: '#f5c518',
+    color: '#000',
+    fontWeight: 600,
+    cursor: 'pointer',
+  },
+  authInput: {
+    width: '100%',
+    padding: '8px 10px',
+    marginBottom: 10,
+    borderRadius: 6,
+    border: '1px solid #333',
+    background: '#0f0f0f',
+    color: '#fff',
+  },
 }
