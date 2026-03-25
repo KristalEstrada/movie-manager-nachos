@@ -1,95 +1,92 @@
-🎬 Movie Manager Nachos
+# 🎬 Movie Manager Nachos
 
-A full-stack application with a FastAPI backend and React + Vite frontend for managing movie data.
+Movie Manager Nachos is a full-stack application with a FastAPI backend and a React + Vite frontend.
 
-📌 Prerequisites
+---
+
+## 📌 Prerequisites
 
 Before running this project, make sure you have:
 
-Python 3.11.5 (recommended for compatibility)
-Node.js (v16 or higher)
-npm (comes with Node)
-Git
-📁 Project Structure
+- Python 3.11.5
+- Node.js
+- npm
+- Git
+
+---
+
+## 📁 Project Structure
+
 movie-manager-nachos/
-├── backend/
-│   ├── __init__.py
-│   └── main.py
-├── data/
-├── frontend/
-│   ├── index.html
-│   ├── package.json
-│   ├── vite.config.js
-│   └── src/
-├── requirements.txt
-└── .gitignore
-🚀 Deployment / Setup Instructions
-1. Clone the Repository
-git clone <your-repo-url>
+- backend/
+- frontend/
+- data/
+- requirements.txt
+- .gitignore
+
+---
+
+## 🚀 Step-by-Step Instructions to Run the Project
+
+### 1. Clone the repository
+
+```bash
+git clone <your-repository-url>
 cd movie-manager-nachos
-⚙️ Backend Setup (FastAPI)
-Step 1: Create Virtual Environment
+
+### 2. Create a virtual environment
 python3 -m venv .venv
-Step 2: Activate Virtual Environment
 
-Mac/Linux:
-
+### 3. Activate the virtual environment
+Mac/Linux
 source .venv/bin/activate
-
-Windows:
-
+Windows
 .venv\Scripts\activate
-Step 3: Install Dependencies
+### 4. Install backend dependencies
 pip install -r requirements.txt
-Step 4: Run Backend Server
-python -m uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
 
-Backend will run at:
-👉 http://127.0.0.1:8000
+###5. Start the backend server
+python -m uvicorn backend.main:app --reload --host localhost --port 8000
 
-⚠️ If Port 8000 Is Busy
-python -m uvicorn backend.main:app --reload --host 127.0.0.1 --port 8001
-💻 Frontend Setup (React + Vite)
-Step 1: Open a New Terminal
+### 6. Open a second terminal
+
+Keep the backend running. Open a new terminal for the frontend.
+
+### 7. Go to the frontend folder
 cd frontend
-Step 2: Install Dependencies
-npm install
-Step 3: Run Frontend
+
+###8. Install frontend dependencies
+
+### 9. Start the frontend
 npm run dev
 
 Frontend will run at:
-👉 http://127.0.0.1:5173
+http://localhost:5173
+npm install
 
-🔗 Connecting Frontend to Backend
-
-By default, the frontend connects to:
-
-http://127.0.0.1:8000
-
-If your backend runs on a different port:
-
-VITE_API_PROXY_TARGET=http://127.0.0.1:8001 npm run dev
 🔁 Repeatable Deployment Method
 
-This project uses a script-based deployment approach, meaning:
+This project uses a repeatable setup process:
 
-Backend setup is reproducible using:
-venv + requirements.txt
-Frontend setup is reproducible using:
-npm install + package.json
+Backend is set up using a virtual environment and requirements.txt
+Frontend is set up using npm install and package.json
 
-Any developer can follow the steps above to run the project consistently on their machine.
+Any user can follow the steps above to successfully run the project on their machine.
 
 🌿 Git Workflow
-
-To ensure smooth collaboration:
-
 main → production-ready code
-dev → integration branch
+dev → shared integration branch
 feature/<name>-<task> → individual work
-Rules:
+###Rules
 Create feature branches from dev
 Push only to your feature branch
-Open PRs into dev
-No direct pushes to dev
-
+Open Pull Requests into dev
+Do not push directly to dev
+###Basic Workflow
+Clone the repository
+Switch to the dev branch
+Create a feature branch
+Make changes
+Commit and push
+Open a Pull Request into dev
+After review, merge the Pull Request
