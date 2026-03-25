@@ -1,0 +1,82 @@
+[
+  {
+    "auditorium": "Auditorium 1",
+    "capacity": 75,
+    "start_time": "2026-03-01T10:00:00",
+    "movie": {
+      "title": "Avatar",
+      "duration_min": 190,
+      "rating": "R"
+    }
+  },
+  {
+    "auditorium": "Auditorium 1",
+    "capacity": 75,
+    "start_time": "2026-03-01T13:25:00",
+    "movie": {
+      "title": "Avatar",
+      "duration_min": 190,
+      "rating": "R"
+    }
+  },
+  {
+    "auditorium": "Auditorium 1",
+    "capacity": 75,
+    "start_time": "2026-03-03T13:30:00",
+    "movie": {
+      "title": "Movie1",
+      "duration_min": 90,
+      "rating": "R"
+    }
+  },
+  {
+    "auditorium": "Auditorium 1",
+    "capacity": 75,
+    "start_time": "2026-03-23T16:54:00",
+    "movie": {
+      "title": "Spider man",
+      "duration_min": 123,
+      "rating": "NR"
+    }
+  },
+  {
+    "auditorium": "Auditorium 2",
+    "capacity": 75,
+    "start_time": "2026-03-23T10:00:00",
+    "movie": {
+      "title": "Avatar",
+      "duration_min": 190,
+      "rating": "R"
+    }
+  },
+  {
+    "auditorium": "Auditorium 1",
+    "capacity": 75,
+    "start_time": "2026-03-24T10:00:00",
+    "movie": {
+      "title": "Inception",
+      "duration_min": 148,
+      "rating": "PG-13"
+    }
+  },
+  {
+    "auditorium": "Auditorium 1",
+    "capacity": 75,
+    "start_time": "2026-03-25T10:00:00",
+    "movie": {
+      "title": "Avatar",
+      "duration_min": 190,
+      "rating": "R"
+    }
+  },
+  {
+    "auditorium": "Auditorium 1",
+    "capacity": 75,
+    "start_time": "2026-03-25T13:15:00",
+    "movie": {
+      "title": "Avatar",
+      "duration_min": 180,
+      "rating": "R"
+    }
+  }
+]
