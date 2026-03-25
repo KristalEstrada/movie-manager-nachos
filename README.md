@@ -1,36 +1,17 @@
-<<<<<<< HEAD
-# movie-manager-nachos
-## Git Workflow
+🎬 Movie Manager Nachos
 
-To ensure smooth collaboration, the team will follow this branching strategy:
+A full-stack application with a FastAPI backend and React + Vite frontend for managing movie data.
 
-- The `main` branch contains production-ready code.
-- The `dev` branch is the shared integration branch.
-- All developers must create their own feature branch from `dev`.
-- Feature branch naming format: `feature/<name>-<task>`
-- Developers push changes only to their feature branch.
-- Pull Requests (PRs) must target the `dev` branch.
-- Direct pushes to `dev` are not allowed.
+📌 Prerequisites
 
-### Basic Workflow
+Before running this project, make sure you have:
 
-1. Clone the repository  
-2. Switch to the `dev` branch  
-3. Create a feature branch  
-4. Commit and push changes  
-5. Open a Pull Request into `dev`  
-6. After review, the PR is merged  
-
-This workflow ensures all team members can safely contribute and merge code.
-=======
-# Movie Manager Nachos
-
-Cleaned project structure for running a FastAPI backend and a React + Vite frontend.
-
-## Project Layout
-
-```text
-movie-manager-nachos-fixed/
+Python 3.11.5 (recommended for compatibility)
+Node.js (v16 or higher)
+npm (comes with Node)
+Git
+📁 Project Structure
+movie-manager-nachos/
 ├── backend/
 │   ├── __init__.py
 │   └── main.py
@@ -38,61 +19,77 @@ movie-manager-nachos-fixed/
 ├── frontend/
 │   ├── index.html
 │   ├── package.json
-│   ├── package-lock.json
 │   ├── vite.config.js
 │   └── src/
 ├── requirements.txt
 └── .gitignore
-```
-
-## Backend setup
-
-From the project root:
-
-```bash
+🚀 Deployment / Setup Instructions
+1. Clone the Repository
+git clone <your-repo-url>
+cd movie-manager-nachos
+⚙️ Backend Setup (FastAPI)
+Step 1: Create Virtual Environment
 python3 -m venv .venv
+Step 2: Activate Virtual Environment
+
+Mac/Linux:
+
 source .venv/bin/activate
+
+Windows:
+
+.venv\Scripts\activate
+Step 3: Install Dependencies
 pip install -r requirements.txt
+Step 4: Run Backend Server
 python -m uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
-```
 
-If port 8000 is already in use, either stop the other process or run the backend on a different port:
+Backend will run at:
+👉 http://127.0.0.1:8000
 
-```bash
+⚠️ If Port 8000 Is Busy
 python -m uvicorn backend.main:app --reload --host 127.0.0.1 --port 8001
-```
-
-## Frontend setup
-
-Open a second terminal:
-
-```bash
+💻 Frontend Setup (React + Vite)
+Step 1: Open a New Terminal
 cd frontend
+Step 2: Install Dependencies
 npm install
+Step 3: Run Frontend
 npm run dev
-```
 
-The frontend runs on `http://127.0.0.1:5173`.
+Frontend will run at:
+👉 http://127.0.0.1:5173
 
-## If the backend is using a different port
+🔗 Connecting Frontend to Backend
 
-By default the frontend proxies `/api` requests to `http://127.0.0.1:8000`.
-If your backend is on another port, start Vite like this:
+By default, the frontend connects to:
 
-```bash
-cd frontend
+http://127.0.0.1:8000
+
+If your backend runs on a different port:
+
 VITE_API_PROXY_TARGET=http://127.0.0.1:8001 npm run dev
-```
+🔁 Repeatable Deployment Method
 
-## What was removed from the original zip
+This project uses a script-based deployment approach, meaning:
 
-- duplicate nested project folders
-- `node_modules`
-- `dist`
-- `.venv`
-- `.git`
-- `.vscode`
-- `.DS_Store`
-- `__MACOSX`
-- invalid `python 3.14` line from `requirements.txt`
->>>>>>> ebd7797 (Set up React Vite frontend with Python backend integration)
+Backend setup is reproducible using:
+venv + requirements.txt
+Frontend setup is reproducible using:
+npm install + package.json
+
+Any developer can follow the steps above to run the project consistently on their machine.
+
+🌿 Git Workflow
+
+To ensure smooth collaboration:
+
+main → production-ready code
+dev → integration branch
+feature/<name>-<task> → individual work
+Rules:
+Create feature branches from dev
+Push only to your feature branch
+Open PRs into dev
+No direct pushes to dev
+
