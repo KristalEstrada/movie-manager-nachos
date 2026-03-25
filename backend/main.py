@@ -25,7 +25,7 @@ STORE = {
     "next_id": 1,
 }
 
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+DATA_DIR = Path(__file__).resolve().parent.parent / "frontend" / "public"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 

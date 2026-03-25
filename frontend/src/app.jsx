@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { getSchedule, saveSchedule, loadSchedule, clearSchedule } from './api/schedulerApi'
+import { getSchedule } from './api/schedulerApi'
 import AddShowtimePanel from './webpage/AddShowTimePanel'
 import ScheduleView from './webpage/ScheduleView'
 
@@ -8,53 +8,43 @@ export default function App() {
   const [status, setStatus]       = useState(null)   // { msg, type }
   const [loadingInit, setLoadingInit] = useState(true)
 
-  const refreshSchedule = useCallback(async () => {
-    try {
-      const data = await getSchedule()
-      setShowtimes(data)
-    } catch (e) {
-      console.error('Refresh failed', e)
-    }
-  }, [])
+ const refreshSchedule = useCallback(async () => {
+  try {
+    const data = await getSchedule()
+    console.log("API data:", data)
+    setShowtimes(data.showtimes ?? data)
+  } catch (e) {
+    console.error('Refresh failed', e)
+  }
+}, [])
 
   useEffect(() => {
     refreshSchedule().finally(() => setLoadingInit(false))
   }, [refreshSchedule])
 
-  function flashStatus(msg, type = 'success') {
-    setStatus({ msg, type })
-    setTimeout(() => setStatus(null), 3500)
-  }
+ function flashStatus(msg, type = 'success') {
+  setStatus({ msg, type })
+  setTimeout(() => setStatus(null), 3500)
+}
 
-  async function handleSave() {
-    try {
-      await saveSchedule('schedule.json')
-      flashStatus('✅ Schedule saved to schedule.json')
-    } catch (e) {
-      flashStatus(`❌ Save failed: ${e.message}`, 'error')
-    }
-  }
+function handleSave() {
+  flashStatus('Use the Python app to save schedule.json, then copy it into frontend/public.', 'error')
+}
 
-  async function handleLoad() {
-    try {
-      const res = await loadSchedule('schedule.json')
-      setShowtimes(res.showtimes)
-      flashStatus(`✅ Loaded ${res.showtimes.length} showtime(s) from schedule.json`)
-    } catch (e) {
-      flashStatus(`❌ Load failed: ${e.message}`, 'error')
-    }
+async function handleLoad() {
+  try {
+    await refreshSchedule()
+    flashStatus('✅ Schedule loaded from frontend/public/schedule.json')
+  } catch (e) {
+    flashStatus('❌ Load failed', 'error')
   }
+}
 
-  async function handleClear() {
-    if (!window.confirm('Clear the entire schedule? This cannot be undone.')) return
-    try {
-      await clearSchedule()
-      setShowtimes([])
-      flashStatus('🗑 Schedule cleared.')
-    } catch (e) {
-      flashStatus(`❌ Clear failed: ${e.message}`, 'error')
-    }
-  }
+function handleClear() {
+  setShowtimes([])
+  flashStatus('Cleared view only. Backend file was not changed.', 'error')
+}
+ 
 
   return (
     <div style={styles.root}>
