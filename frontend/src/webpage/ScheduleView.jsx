@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { sellTicket } from '../api/schedulerApi'
+import { sellTicket, deleteShowtime } from '../api/schedulerApi'
 
 function fmtTime(iso) {
   return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -8,7 +8,20 @@ function fmtDate(iso) {
   return new Date(iso).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })
 }
 
-function ShowtimeCard({ showtime, onTicketSold }) {
+function ShowtimeCard({ showtime, onTicketSold, canDelete }) {
+    const [deleting, setDeleting] = useState(false)
+    async function handleDelete() {
+      if (!window.confirm('Delete this showtime?')) return;
+      setDeleting(true)
+      try {
+        await deleteShowtime(showtime.id)
+        onTicketSold()
+      } catch (e) {
+        alert('Delete failed: ' + e.message)
+      } finally {
+        setDeleting(false)
+      }
+    }
   const [qty, setQty] = useState(1)
   const [loading, setLoading] = useState(false)
   const [msg, setMsg] = useState(null)
@@ -37,6 +50,9 @@ function ShowtimeCard({ showtime, onTicketSold }) {
       <div style={styles.cardHeader}>
         <span style={styles.movieTitle}>{showtime.movie.title}</span>
         <span className="tag rating">{showtime.movie.rating}</span>
+        {canDelete && (
+          <button onClick={handleDelete} disabled={deleting} style={{ background: 'none', border: 'none', color: '#ff4f4f', fontWeight: 700, cursor: 'pointer', fontSize: 16 }} title="Delete showtime">✖</button>
+        )}
       </div>
 
       {/* Times */}
@@ -84,7 +100,7 @@ function ShowtimeCard({ showtime, onTicketSold }) {
   )
 }
 
-export default function ScheduleView({ showtimes, onRefresh, canSell = true }) {
+export default function ScheduleView({ showtimes, onRefresh, canSell = true, canDelete = false }) {
   if (!showtimes.length) {
     return (
       <div style={styles.empty}>
@@ -110,7 +126,7 @@ export default function ScheduleView({ showtimes, onRefresh, canSell = true }) {
           <p style={styles.dateLabel}>{fmtDate(shows[0].start_time)}</p>
           <div style={styles.cards}>
             {shows.map((s) => (
-              <ShowtimeCard key={s.id} showtime={s} onTicketSold={onRefresh} />
+              <ShowtimeCard key={s.id} showtime={s} onTicketSold={onRefresh} canDelete={canDelete} />
             ))}
           </div>
         </div>

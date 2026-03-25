@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { getSchedule } from './api/schedulerApi'
 import AddShowtimePanel from './webpage/AddShowTimePanel'
+import ManageMoviesPanel from './webpage/ManageMoviesPanel'
 import ScheduleView from './webpage/ScheduleView'
 
 const MANAGER_PASSWORD = 'nachos-123'
@@ -99,7 +100,12 @@ function handleClear() {
       </header>
 
       <div style={styles.body}>
-        {role === 'manager' && <AddShowtimePanel onAdded={refreshSchedule} />}
+        {role === 'manager' && (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <ManageMoviesPanel onChanged={refreshSchedule} />
+            <AddShowtimePanel onAdded={refreshSchedule} />
+          </div>
+        )}
 
         <main style={styles.main}>
           <div style={styles.mainHeader}>
@@ -114,7 +120,7 @@ function handleClear() {
           {loadingInit ? (
             <div style={styles.loading}>Loading schedule…</div>
           ) : (
-            <ScheduleView showtimes={showtimes} onRefresh={refreshSchedule} canSell={role === 'manager'} />
+            <ScheduleView showtimes={showtimes} onRefresh={refreshSchedule} canSell={role === 'manager'} canDelete={role === 'manager'} />
           )}
         </main>
       </div>

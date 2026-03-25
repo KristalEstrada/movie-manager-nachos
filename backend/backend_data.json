@@ -1,0 +1,30 @@
+{
+  "showtimes": [
+    {
+      "id": 3,
+      "movie_id": 1,
+      "start_time": "2026-03-25T10:00:00",
+      "end_time": "2026-03-25T12:00:00",
+      "auditorium": "Auditorium 1",
+      "capacity": 75,
+      "tickets_sold": 0
+    }
+  ],
+  "movies": [
+    {
+      "id": 1,
+      "title": "Spider Man 3",
+      "duration_min": 120,
+      "rating": "R",
+      "description": "a"
+    },
+    {
+      "id": 2,
+      "title": "Avatar",
+      "duration_min": 240,
+      "rating": "PG-13",
+      "description": ""
+    }
+  ],
+  "next_id": 4
+}

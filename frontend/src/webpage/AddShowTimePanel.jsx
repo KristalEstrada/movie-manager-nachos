@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   generateTimeOptions,
   enforceRoom,
   addShowtime,
+  getMovies,
 } from '../api/schedulerApi'
 import TimeOptionsModal from './TimeOptionsModal'
 
@@ -13,19 +14,21 @@ function today() {
 export default function AddShowtimePanel({ onAdded }) {
   const [form, setForm] = useState({
     room: '',
-    title: '',
-    duration_min: '',
-    rating: 'NR',
-    description: '',
+    movie_id: '',
     capacity: '75',
     day: today(),
     buffer_min: '15',
     day_start: '10:00',
   })
+  const [movies, setMovies] = useState([])
   const [options, setOptions]   = useState([])
   const [showModal, setShowModal] = useState(false)
   const [log, setLog]           = useState([])  // activity log
   const [loading, setLoading]   = useState(false)
+
+  useEffect(() => {
+    getMovies().then(setMovies)
+  }, [])
 
   function set(key, val) {
     setForm((f) => ({ ...f, [key]: val }))
@@ -37,25 +40,28 @@ export default function AddShowtimePanel({ onAdded }) {
 
   async function handleGenerateOptions(e) {
     e.preventDefault()
-    if (!form.room || !form.title || !form.duration_min) {
-      pushLog('Fill in Room #, Movie Title, and Duration first.', 'error')
+    if (!form.room || !form.movie_id) {
+      pushLog('Select a room and movie.', 'error')
+      return
+    }
+    const movie = movies.find((m) => m.id === parseInt(form.movie_id))
+    if (!movie) {
+      pushLog('Movie not found.', 'error')
       return
     }
     setLoading(true)
     try {
       const auditorium = `Auditorium ${form.room}`
-
-      // Enforce one movie per room per day
-      const { allowed } = await enforceRoom(form.day, auditorium, form.title)
+      // Enforce one movie per room per day (legacy, but harmless)
+      const { allowed } = await enforceRoom(form.day, auditorium, movie.title)
       if (!allowed) {
         pushLog(`❌ ${auditorium} already has a different movie on ${form.day}`, 'error')
         setLoading(false)
         return
       }
-
       const opts = await generateTimeOptions({
         day: form.day,
-        duration_min: parseInt(form.duration_min),
+        duration_min: movie.duration_min,
         day_start_hhmm: form.day_start,
         buffer_min: parseInt(form.buffer_min),
         count: 5,
@@ -74,18 +80,14 @@ export default function AddShowtimePanel({ onAdded }) {
     const auditorium = `Auditorium ${form.room}`
     try {
       const st = await addShowtime({
-        movie: {
-          title: form.title,
-          duration_min: parseInt(form.duration_min),
-          rating: form.rating || 'NR',
-          description: form.description,
-        },
+        movie_id: parseInt(form.movie_id),
         start_time: opt.start_time,
         auditorium,
         capacity: parseInt(form.capacity) || 75,
       })
+      const movie = movies.find((m) => m.id === parseInt(form.movie_id))
       pushLog(
-        `✅ Added "${form.title}" to ${auditorium} at ${new Date(opt.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+        `✅ Added "${movie?.title || 'Movie'}" to ${auditorium} at ${new Date(opt.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
         'success',
       )
       onAdded()
@@ -97,14 +99,12 @@ export default function AddShowtimePanel({ onAdded }) {
   return (
     <div style={styles.panel}>
       <h2 style={styles.panelTitle}>📋 Assign Showtime</h2>
-
       <form onSubmit={handleGenerateOptions} style={styles.form}>
         {/* Date */}
         <div className="field">
           <label>Date</label>
           <input type="date" value={form.day} onChange={(e) => set('day', e.target.value)} />
         </div>
-
         {/* Room */}
         <div className="field">
           <label>Room #</label>
@@ -117,42 +117,16 @@ export default function AddShowtimePanel({ onAdded }) {
             required
           />
         </div>
-
-        {/* Movie title */}
+        {/* Movie selection */}
         <div className="field">
-          <label>Movie Title</label>
-          <input
-            type="text"
-            placeholder="Inception"
-            value={form.title}
-            onChange={(e) => set('title', e.target.value)}
-            required
-          />
-        </div>
-
-        {/* Duration */}
-        <div className="field">
-          <label>Duration (minutes)</label>
-          <input
-            type="number"
-            min={1}
-            placeholder="148"
-            value={form.duration_min}
-            onChange={(e) => set('duration_min', e.target.value)}
-            required
-          />
-        </div>
-
-        {/* Rating */}
-        <div className="field">
-          <label>Rating</label>
-          <select value={form.rating} onChange={(e) => set('rating', e.target.value)}>
-            {['G', 'PG', 'PG-13', 'R', 'NC-17', 'NR'].map((r) => (
-              <option key={r} value={r}>{r}</option>
+          <label>Movie</label>
+          <select value={form.movie_id} onChange={(e) => set('movie_id', e.target.value)} required>
+            <option value="">Select a movie…</option>
+            {movies.map((m) => (
+              <option key={m.id} value={m.id}>{m.title} ({m.duration_min} min, {m.rating})</option>
             ))}
           </select>
         </div>
-
         {/* Capacity */}
         <div className="field">
           <label>Seat Capacity</label>
@@ -163,7 +137,6 @@ export default function AddShowtimePanel({ onAdded }) {
             onChange={(e) => set('capacity', e.target.value)}
           />
         </div>
-
         {/* Advanced */}
         <details style={styles.advanced}>
           <summary style={styles.advSummary}>Advanced scheduling options</summary>
@@ -181,23 +154,12 @@ export default function AddShowtimePanel({ onAdded }) {
                 onChange={(e) => set('buffer_min', e.target.value)}
               />
             </div>
-            <div className="field">
-              <label>Description (optional)</label>
-              <input
-                type="text"
-                value={form.description}
-                onChange={(e) => set('description', e.target.value)}
-                placeholder="Short synopsis…"
-              />
-            </div>
           </div>
         </details>
-
         <button type="submit" style={styles.generateBtn} disabled={loading}>
           {loading ? 'Loading…' : '🎬 Generate Time Options'}
         </button>
       </form>
-
       {/* Activity log */}
       {log.length > 0 && (
         <div style={styles.logBox}>
@@ -210,7 +172,6 @@ export default function AddShowtimePanel({ onAdded }) {
           ))}
         </div>
       )}
-
       {/* Modal */}
       {showModal && (
         <TimeOptionsModal

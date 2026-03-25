@@ -1,3 +1,6 @@
+export const getMovies = () => req('/movies')
+export const deleteMovie = (id) => req(`/movies/${id}`, 'DELETE')
+export const deleteShowtime = (id) => req(`/showtimes/${id}`, 'DELETE')
 const BASE = '/api'
 
 async function req(path, method = 'GET', body = null) {
