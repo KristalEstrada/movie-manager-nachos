@@ -1,23 +1,39 @@
 from datetime import date
 
 from src.scheduler.scheduler import Scheduler
-from src.models.movie import Movie
 from src.models.showtime import Showtime
+from src.models.movie import Movie
+from src.models.movie_repository import MovieRepository
 
 
 def print_schedule(showtimes: list[Showtime]) -> None:
     print("\n=== MOVIE MANAGER BY NACHOS: SHOWTIMES ===")
-    for s in showtimes:
-        t = s.start_time.strftime("%I:%M %p")
+    for showtime in showtimes:
+        time_str = showtime.start_time.strftime("%I:%M %p")
         print(
-            f"{t} | {s.movie.title} ({s.movie.rating}) "
-            f"- {s.movie.duration_min} min | {s.auditorium} "
-            f"| Seats left: {s.seats_left}"
+            f"{time_str} | {showtime.movie.title} ({showtime.movie.rating}) "
+            f"- {showtime.movie.duration_min} min | {showtime.auditorium} "
+            f"| Seats left: {showtime.seats_left}"
         )
 
 
 def main() -> None:
     print("Movie Manager by Nachos starting...")
+    # ---- TEST MOVIE STORAGE ----
+    repo = MovieRepository()
+
+    test_movie = Movie(
+        title="Inception",
+        duration_min=148,
+        rating="PG-13",
+        description="A mind-bending thriller"
+    )
+
+    repo.add_movie(test_movie)
+
+    print("\nMovies in DB:")
+    for movie in repo.get_all_movies():
+        print(movie)
 
     sched = Scheduler()
 
@@ -52,12 +68,13 @@ def main() -> None:
         auditorium = f"Auditorium {room_num}"
 
         title = input("Enter movie name: ").strip()
-        length = int(input("Enter movie length (minutes): ").strip())
-
-        # rating isn't in your new requirement, but your print shows rating
+        try:
+            length = int(input("Enter movie length (minutes): ").strip())
+        except ValueError:
+            print("❌ Please enter a valid number for movie length.")
+            continue
         rating = input("Enter rating (optional, press Enter for NR): ").strip() or "NR"
 
-        # Enforce rule: one movie per room per day
         if not sched.enforce_one_movie_per_room_per_day(today, auditorium, title):
             print(f"❌ {auditorium} already has a different movie scheduled today.")
             continue
@@ -65,12 +82,17 @@ def main() -> None:
         movie = Movie(title, length, rating)
         sched.add_movie(movie)
 
-        # Generate dynamic options 1-5 based on length (+ buffer)
-        options = sched.generate_time_options(today, length, day_start_hhmm="10:00", buffer_min=15, count=5)
+        options = sched.generate_time_options(
+            today,
+            length,
+            day_start_hhmm="10:00",
+            buffer_min=15,
+            count=5
+        )
 
         print("\nPick options 1-5 for showtimes (auto-generated from movie length):")
-        for opt in options:
-            print(f"{opt.option_num}) {opt.start_time.strftime('%I:%M %p')} - {opt.end_time.strftime('%I:%M %p')}")
+        for option in options:
+            print(f"{option.option_num}) {option.start_time.strftime('%I:%M %p')} - {option.end_time.strftime('%I:%M %p')}")
 
         picks_raw = input("Enter picks like 1,3,5 (or press Enter to skip): ").strip()
         if not picks_raw:
@@ -78,14 +100,14 @@ def main() -> None:
             continue
 
         picks = [p.strip() for p in picks_raw.split(",") if p.strip()]
-        for p in picks:
-            if not p.isdigit():
-                print(f"⚠️ Skipping invalid pick: {p}")
+        for pick in picks:
+            if not pick.isdigit():
+                print(f"⚠️ Skipping invalid pick: {pick}")
                 continue
-            n = int(p)
-            match = next((o for o in options if o.option_num == n), None)
+            pick_num = int(pick)
+            match = next((opt for opt in options if opt.option_num == pick_num), None)
             if not match:
-                print(f"⚠️ Pick out of range (1-5): {p}")
+                print(f"⚠️ Pick out of range (1-5): {pick}")
                 continue
 
             ok = sched.add_showtime(Showtime(movie, match.start_time, auditorium, capacity=75))
@@ -94,10 +116,8 @@ def main() -> None:
             else:
                 print(f"✅ Added {auditorium}: {match.start_time.strftime('%I:%M %p')} ({title})")
 
-    # ---- Print final schedule ----
     print_schedule(sched.get_schedule())
 
-    # ---- Save schedule ----
     sched.save_schedule("schedule.json")
     print("\nSaved schedule.json")
 

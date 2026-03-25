@@ -1,7 +1,6 @@
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from .movie import Movie
-from datetime import timedelta
 
 @dataclass
 class Showtime:
@@ -22,5 +21,5 @@ class Showtime:
         return self.capacity - self.tickets_sold
     
     @property
-    def end_time(self):
+    def end_time(self) -> datetime:
         return self.start_time + timedelta(minutes=self.movie.duration_min)
