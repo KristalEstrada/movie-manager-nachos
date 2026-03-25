@@ -1,0 +1,19 @@
+{
+  "showtimes": [
+    {
+      "id": 1,
+      "movie": {
+        "title": "Movie 4",
+        "duration_min": 77,
+        "rating": "NC-17",
+        "description": ""
+      },
+      "start_time": "2026-03-25T16:08:00",
+      "end_time": "2026-03-25T17:25:00",
+      "auditorium": "Auditorium 4",
+      "capacity": 66,
+      "tickets_sold": 9
+    }
+  ],
+  "next_id": 2
+}
