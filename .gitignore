@@ -1,4 +1,14 @@
 # Python
+
+__pycache__/
+*.pyc
+
+# Virtual environment
+.venv/
+
+# Generated files
+schedule.json
+
 .venv/
 __pycache__/
 *.pyc
@@ -11,3 +21,4 @@ frontend/.vite/
 # OS
 .DS_Store
 __MACOSX/
+

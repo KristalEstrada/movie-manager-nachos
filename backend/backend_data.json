@@ -8,6 +8,15 @@
       "auditorium": "Auditorium 1",
       "capacity": 75,
       "tickets_sold": 0
+    },
+    {
+      "id": 4,
+      "movie_id": 1,
+      "start_time": "2026-03-25T14:30:00",
+      "end_time": "2026-03-25T16:30:00",
+      "auditorium": "Auditorium 2",
+      "capacity": 75,
+      "tickets_sold": 0
     }
   ],
   "movies": [
@@ -26,5 +35,5 @@
       "description": ""
     }
   ],
-  "next_id": 4
+  "next_id": 5
 }
