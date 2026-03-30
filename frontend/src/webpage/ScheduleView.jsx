@@ -101,7 +101,20 @@ function ShowtimeCard({ showtime, onTicketSold, canDelete }) {
 }
 
 export default function ScheduleView({ showtimes, onRefresh, canSell = true, canDelete = false }) {
-  if (!showtimes.length) {
+  const [selectedDate, setSelectedDate] = useState('');
+
+  // Sort showtimes by start_time
+  const sortedShowtimes = [...showtimes].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+
+  // Get unique dates from showtimes
+  const uniqueDates = Array.from(new Set(sortedShowtimes.map(s => s.start_time.slice(0, 10))));
+
+  // Filter showtimes by selected date (if any)
+  const filteredShowtimes = selectedDate
+    ? sortedShowtimes.filter(s => s.start_time.slice(0, 10) === selectedDate)
+    : sortedShowtimes;
+
+  if (!filteredShowtimes.length) {
     return (
       <div style={styles.empty}>
         <span style={{ fontSize: 40 }}>🎬</span>
@@ -112,14 +125,30 @@ export default function ScheduleView({ showtimes, onRefresh, canSell = true, can
   }
 
   // Group by auditorium
-  const grouped = {}
-  showtimes.forEach((s) => {
-    if (!grouped[s.auditorium]) grouped[s.auditorium] = []
-    grouped[s.auditorium].push(s)
-  })
+  const grouped = {};
+  filteredShowtimes.forEach((s) => {
+    if (!grouped[s.auditorium]) grouped[s.auditorium] = [];
+    grouped[s.auditorium].push(s);
+  });
 
   return (
     <div>
+      {/* Date filter for customers only */}
+      {!canSell && (
+        <div style={{ marginBottom: 20 }}>
+          <label style={{ marginRight: 8 }}>Filter by date:</label>
+          <select
+            value={selectedDate}
+            onChange={e => setSelectedDate(e.target.value)}
+            style={{ padding: '4px 8px', fontSize: 14 }}
+          >
+            <option value=''>All Dates</option>
+            {uniqueDates.map(date => (
+              <option key={date} value={date}>{fmtDate(date)}</option>
+            ))}
+          </select>
+        </div>
+      )}
       {Object.entries(grouped).map(([aud, shows]) => (
         <div key={aud} style={styles.group}>
           <h3 style={styles.audTitle}>🏟 {aud}</h3>
@@ -132,7 +161,7 @@ export default function ScheduleView({ showtimes, onRefresh, canSell = true, can
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 const styles = {
