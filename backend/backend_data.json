@@ -17,6 +17,24 @@
       "auditorium": "Auditorium 2",
       "capacity": 75,
       "tickets_sold": 0
+    },
+    {
+      "id": 5,
+      "movie_id": 1,
+      "start_time": "2026-04-09T14:30:00",
+      "end_time": "2026-04-09T16:30:00",
+      "auditorium": "Auditorium 3",
+      "capacity": 75,
+      "tickets_sold": 0
+    },
+    {
+      "id": 6,
+      "movie_id": 3,
+      "start_time": "2026-03-27T14:30:00",
+      "end_time": "2026-03-27T16:30:00",
+      "auditorium": "Auditorium 1",
+      "capacity": 75,
+      "tickets_sold": 0
     }
   ],
   "movies": [
@@ -33,7 +51,14 @@
       "duration_min": 240,
       "rating": "PG-13",
       "description": ""
+    },
+    {
+      "id": 3,
+      "title": "Anaconda",
+      "duration_min": 120,
+      "rating": "R",
+      "description": ""
     }
   ],
-  "next_id": 5
+  "next_id": 7
 }
