@@ -3,12 +3,15 @@ import { getSchedule } from './api/schedulerApi'
 import AddShowtimePanel from './webpage/AddShowTimePanel'
 import ManageMoviesPanel from './webpage/ManageMoviesPanel'
 import ScheduleView from './webpage/ScheduleView'
+import EmployeePanel from './webpage/EmployeePanel'
 
 const MANAGER_PASSWORD = 'nachos-123'
+const EMPLOYEE_PASSWORD = 'BestEmployeeEver'
 
 export default function App() {
-  const [role, setRole] = useState(null) // null | 'customer' | 'manager'
+  const [role, setRole] = useState(null) // null | 'customer' | 'manager' | 'employee'
   const [managerPass, setManagerPass] = useState('')
+  const [employeePass, setEmployeePass] = useState('')
   const [authError, setAuthError] = useState('')
   const [showtimes, setShowtimes] = useState([])
   const [status, setStatus]       = useState(null)   // { msg, type }
@@ -61,12 +64,30 @@ function handleClear() {
     }
   }
 
+  function employeeLogin() {
+    if (employeePass === EMPLOYEE_PASSWORD) {
+      setRole('employee')
+      setAuthError('')
+    } else {
+      setAuthError('Incorrect employee password')
+    }
+  }
+
   if (!role) {
     return (
       <div style={{ ...styles.root, justifyContent: 'center', alignItems: 'center', padding: 24 }}>
         <div style={styles.authCard}>
           <h2 style={{ marginBottom: 14 }}>Choose Access Mode</h2>
           <button style={styles.authButton} onClick={() => setRole('customer')}>👥 Customer view</button>
+          <div style={{ margin: '16px 0', textAlign: 'center' }}>or</div>
+          <input
+            type="password"
+            placeholder="Employee password"
+            value={employeePass}
+            onChange={(e) => setEmployeePass(e.target.value)}
+            style={styles.authInput}
+          />
+          <button style={styles.authButton} onClick={employeeLogin}>🎟 Employee login</button>
           <div style={{ margin: '16px 0', textAlign: 'center' }}>or</div>
           <input
             type="password"
@@ -89,7 +110,9 @@ function handleClear() {
           <span style={styles.logoIcon}>🍿</span>
           <div>
             <div style={styles.logoTitle}>Nachos Movie Manager</div>
-            <div style={styles.logoSub}>{role === 'manager' ? 'Manager mode' : 'Customer mode'}</div>
+            <div style={styles.logoSub}>
+              {role === 'manager' ? 'Manager mode' : role === 'employee' ? 'Employee mode' : 'Customer mode'}
+            </div>
           </div>
         </div>
         <div style={styles.headerActions}>
@@ -106,11 +129,14 @@ function handleClear() {
             <AddShowtimePanel onAdded={refreshSchedule} />
           </div>
         )}
+        {role === 'employee' && (
+          <EmployeePanel showtimes={showtimes} onSold={refreshSchedule} />
+        )}
 
         <main style={styles.main}>
           <div style={styles.mainHeader}>
             <div>
-              <h1 style={styles.mainTitle}>{role === 'manager' ? "MANAGER SCHEDULE" : "TODAY'S SHOWTIMES"}</h1>
+              <h1 style={styles.mainTitle}>{role === 'manager' ? "MANAGER SCHEDULE" : role === 'employee' ? "SELL TICKETS" : "TODAY'S SHOWTIMES"}</h1>
               <p style={styles.mainSub}>
                 {showtimes.length} showtime{showtimes.length !== 1 ? 's' : ''} ·{' '}
                 {[...new Set(showtimes.map((s) => s.auditorium))].length} auditorium(s)

@@ -7,7 +7,7 @@
       "end_time": "2026-03-25T12:00:00",
       "auditorium": "Auditorium 1",
       "capacity": 75,
-      "tickets_sold": 0
+      "tickets_sold": 1
     },
     {
       "id": 4,
@@ -16,7 +16,7 @@
       "end_time": "2026-03-25T16:30:00",
       "auditorium": "Auditorium 2",
       "capacity": 75,
-      "tickets_sold": 0
+      "tickets_sold": 1
     },
     {
       "id": 5,
@@ -25,7 +25,7 @@
       "end_time": "2026-04-09T16:30:00",
       "auditorium": "Auditorium 3",
       "capacity": 75,
-      "tickets_sold": 0
+      "tickets_sold": 1
     },
     {
       "id": 6,
@@ -34,7 +34,16 @@
       "end_time": "2026-03-27T16:30:00",
       "auditorium": "Auditorium 1",
       "capacity": 75,
-      "tickets_sold": 0
+      "tickets_sold": 1
+    },
+    {
+      "id": 7,
+      "movie_id": 2,
+      "start_time": "2026-04-09T22:45:00",
+      "end_time": "2026-04-10T02:45:00",
+      "auditorium": "Auditorium 1",
+      "capacity": 75,
+      "tickets_sold": 75
     }
   ],
   "movies": [
@@ -58,7 +67,21 @@
       "duration_min": 120,
       "rating": "R",
       "description": ""
+    },
+    {
+      "id": 4,
+      "title": "Scream 7",
+      "duration_min": 120,
+      "rating": "R",
+      "description": "aaa"
+    },
+    {
+      "id": 5,
+      "title": "Hoppers",
+      "duration_min": 140,
+      "rating": "PG",
+      "description": "A little girls journey to saving a pond"
     }
   ],
-  "next_id": 7
+  "next_id": 8
 }
