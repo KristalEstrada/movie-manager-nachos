@@ -1,3 +1,5 @@
+// Sell tickets for a showtime
+export const sellTicket = (showtimeId, qty) => req(`/showtimes/${showtimeId}/sell-ticket`, 'POST', { qty })
 export const getMovies = () => req('/movies')
 export const deleteMovie = (id) => req(`/movies/${id}`, 'DELETE')
 export const deleteShowtime = (id) => req(`/showtimes/${id}`, 'DELETE')
@@ -40,6 +42,3 @@ export const generateTimeOptions = (params) =>
 
 export const enforceRoom = (day, auditorium, movieTitle) =>
   req('/enforce-room', 'POST', { day, auditorium, movie_title: movieTitle })
-
-export const sellTicket = (idx, qty = 1) =>
-  req(`/showtimes/${idx}/sell-ticket`, 'POST', { qty })

@@ -88,7 +88,7 @@ function ShowtimeCard({ showtime, onTicketSold, canDelete }) {
           </button>
         </div>
       ) : (
-        !canSell && <div style={{ color: '#7a7a7a', fontSize: 12, marginTop: 8 }}>Customer view: ticket sales are disabled.</div>
+        !canSell && <div style={{ color: '#7a7a7a', fontSize: 12, marginTop: 8 }}></div>
       )}
 
       {msg && (
