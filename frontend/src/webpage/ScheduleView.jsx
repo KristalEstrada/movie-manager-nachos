@@ -215,21 +215,17 @@ export default function ScheduleView({
   )
 
   // Get unique auditoriums from showtimes
-  const uniqueAuditoriums = Array.from(new Set(sortedShowtimes.map(s => s.auditorium)));
+const uniqueAuditoriums = Array.from(new Set(sortedShowtimes.map(s => s.auditorium)));
+const [selectedAuditorium, setSelectedAuditorium] = useState('')
+// Filter showtimes by selected date (if any)
+const filteredByDate = selectedDate
+  ? sortedShowtimes.filter(s => s.start_time.slice(0, 10) === selectedDate)
+  : sortedShowtimes;
 
-  // Filter showtimes by selected date (if any)
-  const filteredByDate = selectedDate
-    ? sortedShowtimes.filter(s => s.start_time.slice(0, 10) === selectedDate)
-    : sortedShowtimes;
-  const filteredShowtimes = selectedDate
-    ? sortedShowtimes.filter((s) => s.start_time.slice(0, 10) === selectedDate)
-    : sortedShowtimes
-
-  // Filter by selected auditorium (if any)
-  const filteredShowtimes = selectedAuditorium
-    ? filteredByDate.filter(s => s.auditorium === selectedAuditorium)
-    : filteredByDate;
-
+// Filter by selected auditorium (if any)
+const filteredShowtimes = selectedAuditorium
+  ? filteredByDate.filter(s => s.auditorium === selectedAuditorium)
+  : filteredByDate;
   if (!filteredShowtimes.length) {
     return (
       <div style={styles.empty}>
