@@ -7,7 +7,7 @@
       "end_time": "2026-03-25T12:00:00",
       "auditorium": "Auditorium 1",
       "capacity": 75,
-      "tickets_sold": 1
+      "tickets_sold": 75
     },
     {
       "id": 4,
@@ -16,7 +16,7 @@
       "end_time": "2026-03-25T16:30:00",
       "auditorium": "Auditorium 2",
       "capacity": 75,
-      "tickets_sold": 1
+      "tickets_sold": 2
     },
     {
       "id": 5,
@@ -25,7 +25,7 @@
       "end_time": "2026-04-09T16:30:00",
       "auditorium": "Auditorium 3",
       "capacity": 75,
-      "tickets_sold": 1
+      "tickets_sold": 2
     },
     {
       "id": 6,
@@ -34,7 +34,7 @@
       "end_time": "2026-03-27T16:30:00",
       "auditorium": "Auditorium 1",
       "capacity": 75,
-      "tickets_sold": 1
+      "tickets_sold": 11
     },
     {
       "id": 7,
@@ -44,6 +44,42 @@
       "auditorium": "Auditorium 1",
       "capacity": 75,
       "tickets_sold": 75
+    },
+    {
+      "id": 8,
+      "movie_id": 3,
+      "start_time": "2026-03-25T16:45:00",
+      "end_time": "2026-03-25T18:45:00",
+      "auditorium": "Auditorium 1",
+      "capacity": 75,
+      "tickets_sold": 75
+    },
+    {
+      "id": 9,
+      "movie_id": 3,
+      "start_time": "2026-03-25T10:00:00",
+      "end_time": "2026-03-25T12:00:00",
+      "auditorium": "Auditorium 2",
+      "capacity": 75,
+      "tickets_sold": 0
+    },
+    {
+      "id": 10,
+      "movie_id": 1,
+      "start_time": "2026-04-15T12:15:00",
+      "end_time": "2026-04-15T14:15:00",
+      "auditorium": "Auditorium 7",
+      "capacity": 75,
+      "tickets_sold": 5
+    },
+    {
+      "id": 11,
+      "movie_id": 5,
+      "start_time": "2026-04-14T17:45:00",
+      "end_time": "2026-04-14T20:05:00",
+      "auditorium": "Auditorium 1",
+      "capacity": 75,
+      "tickets_sold": 2
     }
   ],
   "movies": [
@@ -83,5 +119,5 @@
       "description": "A little girls journey to saving a pond"
     }
   ],
-  "next_id": 8
+  "next_id": 12
 }

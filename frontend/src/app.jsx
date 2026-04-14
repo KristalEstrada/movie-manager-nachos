@@ -9,56 +9,35 @@ const MANAGER_PASSWORD = 'nachos-123'
 const EMPLOYEE_PASSWORD = 'BestEmployeeEver'
 
 export default function App() {
-  const [role, setRole] = useState(null) // null | 'customer' | 'manager' | 'employee'
+  const [role, setRole] = useState('customer') // 'customer' | 'manager' | 'employee'
+  const [showAccessPanel, setShowAccessPanel] = useState(false)
   const [managerPass, setManagerPass] = useState('')
   const [employeePass, setEmployeePass] = useState('')
   const [authError, setAuthError] = useState('')
   const [showtimes, setShowtimes] = useState([])
-  const [status, setStatus]       = useState(null)   // { msg, type }
   const [loadingInit, setLoadingInit] = useState(true)
 
- const refreshSchedule = useCallback(async () => {
-  try {
-    const data = await getSchedule()
-    console.log("API data:", data)
-    setShowtimes(data.showtimes ?? data)
-  } catch (e) {
-    console.error('Refresh failed', e)
-  }
-}, [])
+  const refreshSchedule = useCallback(async () => {
+    try {
+      const data = await getSchedule()
+      console.log('API data:', data)
+      setShowtimes(data.showtimes ?? data)
+    } catch (e) {
+      console.error('Refresh failed', e)
+    }
+  }, [])
 
   useEffect(() => {
     refreshSchedule().finally(() => setLoadingInit(false))
   }, [refreshSchedule])
 
- function flashStatus(msg, type = 'success') {
-  setStatus({ msg, type })
-  setTimeout(() => setStatus(null), 3500)
-}
-
-function handleSave() {
-  flashStatus('Use the Python app to save schedule.json, then copy it into frontend/public.', 'error')
-}
-
-async function handleLoad() {
-  try {
-    await refreshSchedule()
-    flashStatus('✅ Schedule loaded from frontend/public/schedule.json')
-  } catch (e) {
-    flashStatus('❌ Load failed', 'error')
-  }
-}
-
-function handleClear() {
-  setShowtimes([])
-  flashStatus('Cleared view only. Backend file was not changed.', 'error')
-}
- 
-
   function managerLogin() {
     if (managerPass === MANAGER_PASSWORD) {
       setRole('manager')
+      setShowAccessPanel(false)
       setAuthError('')
+      setManagerPass('')
+      setEmployeePass('')
     } else {
       setAuthError('Incorrect manager password')
     }
@@ -67,41 +46,28 @@ function handleClear() {
   function employeeLogin() {
     if (employeePass === EMPLOYEE_PASSWORD) {
       setRole('employee')
+      setShowAccessPanel(false)
       setAuthError('')
+      setManagerPass('')
+      setEmployeePass('')
     } else {
       setAuthError('Incorrect employee password')
     }
   }
 
-  if (!role) {
-    return (
-      <div style={{ ...styles.root, justifyContent: 'center', alignItems: 'center', padding: 24 }}>
-        <div style={styles.authCard}>
-          <h2 style={{ marginBottom: 14 }}>Choose Access Mode</h2>
-          <button style={styles.authButton} onClick={() => setRole('customer')}>👥 Customer view</button>
-          <div style={{ margin: '16px 0', textAlign: 'center' }}>or</div>
-          <input
-            type="password"
-            placeholder="Employee password"
-            value={employeePass}
-            onChange={(e) => setEmployeePass(e.target.value)}
-            style={styles.authInput}
-          />
-          <button style={styles.authButton} onClick={employeeLogin}>🎟 Employee login</button>
-          <div style={{ margin: '16px 0', textAlign: 'center' }}>or</div>
-          <input
-            type="password"
-            placeholder="Manager password"
-            value={managerPass}
-            onChange={(e) => setManagerPass(e.target.value)}
-            style={styles.authInput}
-          />
-          <button style={styles.authButton} onClick={managerLogin}>🛠 Manager login</button>
-          {authError && <div className="tag error" style={{ marginTop: 10 }}>{authError}</div>}
-        </div>
-      </div>
-    )
+  function switchToCustomer() {
+    setRole('customer')
+    setShowAccessPanel(false)
+    setAuthError('')
+    setManagerPass('')
+    setEmployeePass('')
   }
+
+  function handleClear() {
+    setShowtimes([])
+  }
+
+  const auditoriumCount = [...new Set(showtimes.map((s) => s.auditorium))].length
 
   return (
     <div style={styles.root}>
@@ -111,24 +77,93 @@ function handleClear() {
           <div>
             <div style={styles.logoTitle}>Nachos Movie Manager</div>
             <div style={styles.logoSub}>
-              {role === 'manager' ? 'Manager mode' : role === 'employee' ? 'Employee mode' : 'Customer mode'}
+              {role === 'manager'
+                ? 'Manager mode'
+                : role === 'employee'
+                  ? 'Employee mode'
+                  : 'Customer mode'}
             </div>
           </div>
         </div>
+
         <div style={styles.headerActions}>
-          <button onClick={() => setRole(null)} style={styles.btnOutline}>↩ Switch role</button>
-          <button onClick={refreshSchedule} style={styles.btnOutline}>↻ Refresh</button>
-          {role === 'manager' && <button onClick={handleClear} style={styles.btnDanger}>🗑 Clear</button>}
+          <button
+            onClick={() => {
+              setShowAccessPanel((v) => !v)
+              setAuthError('')
+            }}
+            style={styles.btnOutline}
+          >
+            Access mode
+          </button>
+
+          <button onClick={refreshSchedule} style={styles.btnOutline}>
+            ↻ Refresh
+          </button>
+
+          {role === 'manager' && (
+            <button onClick={handleClear} style={styles.btnDanger}>
+              🗑 Clear
+            </button>
+          )}
         </div>
       </header>
 
+      {showAccessPanel && (
+        <div style={styles.accessPanel}>
+          <div style={styles.accessPanelInner}>
+            <div style={styles.accessColumn}>
+              <div style={styles.accessHeading}>Customer</div>
+              <button onClick={switchToCustomer} style={styles.authButton}>
+                Open customer view
+              </button>
+            </div>
+
+            <div style={styles.accessColumn}>
+              <div style={styles.accessHeading}>Employee</div>
+              <input
+                type="password"
+                placeholder="Employee password"
+                value={employeePass}
+                onChange={(e) => setEmployeePass(e.target.value)}
+                style={styles.authInput}
+              />
+              <button onClick={employeeLogin} style={styles.authButton}>
+                Employee login
+              </button>
+            </div>
+
+            <div style={styles.accessColumn}>
+              <div style={styles.accessHeading}>Manager</div>
+              <input
+                type="password"
+                placeholder="Manager password"
+                value={managerPass}
+                onChange={(e) => setManagerPass(e.target.value)}
+                style={styles.authInput}
+              />
+              <button onClick={managerLogin} style={styles.authButton}>
+                Manager login
+              </button>
+            </div>
+          </div>
+
+          {authError && (
+            <div className="tag error" style={{ marginTop: 12, marginLeft: 24, marginRight: 24 }}>
+              {authError}
+            </div>
+          )}
+        </div>
+      )}
+
       <div style={styles.body}>
         {role === 'manager' && (
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div style={styles.sidebar}>
             <ManageMoviesPanel onChanged={refreshSchedule} />
             <AddShowtimePanel onAdded={refreshSchedule} />
           </div>
         )}
+
         {role === 'employee' && (
           <EmployeePanel showtimes={showtimes} onSold={refreshSchedule} />
         )}
@@ -136,17 +171,29 @@ function handleClear() {
         <main style={styles.main}>
           <div style={styles.mainHeader}>
             <div>
-              <h1 style={styles.mainTitle}>{role === 'manager' ? "MANAGER SCHEDULE" : role === 'employee' ? "SELL TICKETS" : "TODAY'S SHOWTIMES"}</h1>
+              <h1 style={styles.mainTitle}>
+                {role === 'manager'
+                  ? 'MANAGER SCHEDULE'
+                  : role === 'employee'
+                    ? 'SELL TICKETS'
+                    : "TODAY'S SHOWTIMES"}
+              </h1>
               <p style={styles.mainSub}>
-                {showtimes.length} showtime{showtimes.length !== 1 ? 's' : ''} ·{' '}
-                {[...new Set(showtimes.map((s) => s.auditorium))].length} auditorium(s)
+                {showtimes.length} showtime{showtimes.length !== 1 ? 's' : ''} · {auditoriumCount}{' '}
+                auditorium{auditoriumCount !== 1 ? 's' : ''}
               </p>
             </div>
           </div>
+
           {loadingInit ? (
             <div style={styles.loading}>Loading schedule…</div>
           ) : (
-            <ScheduleView showtimes={showtimes} onRefresh={refreshSchedule} canSell={role === 'manager'} canDelete={role === 'manager'} />
+            <ScheduleView
+              showtimes={showtimes}
+              onRefresh={refreshSchedule}
+              salesMode={role}
+              canDelete={role === 'manager'}
+            />
           )}
         </main>
       </div>
@@ -155,7 +202,12 @@ function handleClear() {
 }
 
 const styles = {
-  root: { display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' },
+  root: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100vh',
+    overflow: 'hidden',
+  },
 
   header: {
     display: 'flex',
@@ -168,8 +220,17 @@ const styles = {
     flexShrink: 0,
     gap: 16,
   },
-  logo: { display: 'flex', alignItems: 'center', gap: 12 },
-  logoIcon: { fontSize: 28 },
+
+  logo: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+  },
+
+  logoIcon: {
+    fontSize: 28,
+  },
+
   logoTitle: {
     fontFamily: 'var(--font-display)',
     fontSize: 22,
@@ -177,9 +238,20 @@ const styles = {
     color: '#f5c518',
     lineHeight: 1,
   },
-  logoSub: { fontSize: 11, color: '#7a7a7a', letterSpacing: '.04em', marginTop: 2 },
 
-  headerActions: { display: 'flex', alignItems: 'center', gap: 8 },
+  logoSub: {
+    fontSize: 11,
+    color: '#7a7a7a',
+    letterSpacing: '.04em',
+    marginTop: 2,
+  },
+
+  headerActions: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+  },
+
   btnOutline: {
     background: 'transparent',
     border: '1px solid #2a2a2a',
@@ -187,24 +259,73 @@ const styles = {
     padding: '6px 14px',
     fontSize: 13,
     fontWeight: 500,
+    borderRadius: 6,
+    cursor: 'pointer',
   },
+
   btnDanger: {
     background: 'transparent',
     border: '1px solid #3a1010',
     color: '#ff4f4f',
     padding: '6px 14px',
     fontSize: 13,
+    borderRadius: 6,
+    cursor: 'pointer',
   },
 
-  body: { display: 'flex', flex: 1, overflow: 'hidden' },
+  accessPanel: {
+    background: '#101010',
+    borderBottom: '1px solid #1f1f1f',
+    padding: '18px 24px',
+    flexShrink: 0,
+  },
 
-  main: { flex: 1, padding: '24px 28px', overflowY: 'auto' },
+  accessPanelInner: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, minmax(220px, 1fr))',
+    gap: 16,
+  },
+
+  accessColumn: {
+    background: '#151515',
+    border: '1px solid #2a2a2a',
+    borderRadius: 10,
+    padding: 14,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 10,
+  },
+
+  accessHeading: {
+    fontSize: 14,
+    fontWeight: 700,
+    color: '#f5c518',
+  },
+
+  body: {
+    display: 'flex',
+    flex: 1,
+    overflow: 'hidden',
+  },
+
+  sidebar: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+
+  main: {
+    flex: 1,
+    padding: '24px 28px',
+    overflowY: 'auto',
+  },
+
   mainHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 24,
   },
+
   mainTitle: {
     fontFamily: 'var(--font-display)',
     fontSize: 36,
@@ -212,29 +333,22 @@ const styles = {
     color: '#e8e8e8',
     lineHeight: 1,
   },
-  mainSub: { fontSize: 13, color: '#7a7a7a', marginTop: 6 },
-  refreshBtn: {
-    background: 'transparent',
-    border: '1px solid #2a2a2a',
-    color: '#7a7a7a',
-    padding: '6px 12px',
+
+  mainSub: {
     fontSize: 13,
-    borderRadius: 6,
+    color: '#7a7a7a',
+    marginTop: 6,
   },
-  loading: { color: '#7a7a7a', padding: '40px 0', textAlign: 'center' },
-  authCard: {
-    width: 320,
-    background: '#111',
-    border: '1px solid #2a2a2a',
-    borderRadius: 10,
-    padding: 20,
-    boxShadow: '0 10px 20px rgba(0,0,0,0.4)',
+
+  loading: {
+    color: '#7a7a7a',
+    padding: '40px 0',
     textAlign: 'center',
   },
+
   authButton: {
     width: '100%',
     padding: '10px 12px',
-    margin: '6px 0',
     fontSize: 14,
     borderRadius: 6,
     border: '1px solid #2a2a2a',
@@ -243,10 +357,10 @@ const styles = {
     fontWeight: 600,
     cursor: 'pointer',
   },
+
   authInput: {
     width: '100%',
     padding: '8px 10px',
-    marginBottom: 10,
     borderRadius: 6,
     border: '1px solid #333',
     background: '#0f0f0f',
