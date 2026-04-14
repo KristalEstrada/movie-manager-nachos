@@ -102,6 +102,7 @@ function ShowtimeCard({ showtime, onTicketSold, canDelete }) {
 
 export default function ScheduleView({ showtimes, onRefresh, canSell = true, canDelete = false }) {
   const [selectedDate, setSelectedDate] = useState('');
+  const [selectedAuditorium, setSelectedAuditorium] = useState('');
 
   // Sort showtimes by start_time
   const sortedShowtimes = [...showtimes].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
@@ -109,10 +110,18 @@ export default function ScheduleView({ showtimes, onRefresh, canSell = true, can
   // Get unique dates from showtimes
   const uniqueDates = Array.from(new Set(sortedShowtimes.map(s => s.start_time.slice(0, 10))));
 
+  // Get unique auditoriums from showtimes
+  const uniqueAuditoriums = Array.from(new Set(sortedShowtimes.map(s => s.auditorium)));
+
   // Filter showtimes by selected date (if any)
-  const filteredShowtimes = selectedDate
+  const filteredByDate = selectedDate
     ? sortedShowtimes.filter(s => s.start_time.slice(0, 10) === selectedDate)
     : sortedShowtimes;
+
+  // Filter by selected auditorium (if any)
+  const filteredShowtimes = selectedAuditorium
+    ? filteredByDate.filter(s => s.auditorium === selectedAuditorium)
+    : filteredByDate;
 
   if (!filteredShowtimes.length) {
     return (
@@ -145,6 +154,17 @@ export default function ScheduleView({ showtimes, onRefresh, canSell = true, can
             <option value=''>All Dates</option>
             {uniqueDates.map(date => (
               <option key={date} value={date}>{fmtDate(date)}</option>
+            ))}
+          </select>
+          <label style={{ marginLeft: 16, marginRight: 8 }}>Filter by auditorium:</label>
+          <select
+            value={selectedAuditorium}
+            onChange={e => setSelectedAuditorium(e.target.value)}
+            style={{ padding: '4px 8px', fontSize: 14 }}
+          >
+            <option value=''>All Auditoriums</option>
+            {uniqueAuditoriums.map(aud => (
+              <option key={aud} value={aud}>{aud}</option>
             ))}
           </select>
         </div>

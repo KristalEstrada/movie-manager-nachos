@@ -121,6 +121,18 @@ def main() -> None:
     sched.save_schedule("schedule.json")
     print("\nSaved schedule.json")
 
+    # ---- Filter schedule by room ----
+    print("\n--- Filter Schedule by Room ---")
+    filter_room = input("Enter room number to filter (or press Enter for all): ").strip()
+    if filter_room:
+        filtered_showtimes = [s for s in sched.get_schedule() if s.auditorium == f"Auditorium {filter_room}"]
+        if filtered_showtimes:
+            print_schedule(filtered_showtimes)
+        else:
+            print(f"No showtimes found for Auditorium {filter_room}.")
+    else:
+        print_schedule(sched.get_schedule())
+
 
 if __name__ == "__main__":
     main()
