@@ -4,6 +4,7 @@ import AddShowtimePanel from './webpage/AddShowTimePanel'
 import ManageMoviesPanel from './webpage/ManageMoviesPanel'
 import ScheduleView from './webpage/ScheduleView'
 import EmployeePanel from './webpage/EmployeePanel'
+import ConcessionsPanel from './webpage/ConcessionsPanel'
 
 const MANAGER_PASSWORD = 'nachos-123'
 const EMPLOYEE_PASSWORD = 'BestEmployeeEver'
@@ -160,6 +161,7 @@ export default function App() {
         {role === 'manager' && (
           <div style={styles.sidebar}>
             <ManageMoviesPanel onChanged={refreshSchedule} />
+            <ConcessionsPanel />
             <AddShowtimePanel onAdded={refreshSchedule} />
           </div>
         )}
