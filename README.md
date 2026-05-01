@@ -91,3 +91,14 @@ Make changes
 Commit and push
 Open a pull request into dev
 After review, merge the pull request
+
+
+
+After starting the application, follow these steps to confirm it is working:
+
+Open a web browser
+Go to http://localhost:5173
+Verify that the application loads without errors
+Navigate to the main feature (such as viewing the movie list or schedule)
+Confirm that movie data is displayed correctly
+Click on a movie or interact with the page to ensure it responds properly
