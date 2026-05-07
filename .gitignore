@@ -22,3 +22,14 @@ frontend/.vite/
 .DS_Store
 __MACOSX/
 
+
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Local database files
+*.db
+backend/movie_manager.db
+
+# Logs
+*.log
