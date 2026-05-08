@@ -7,7 +7,61 @@
       "end_time": "2026-03-25T12:00:00",
       "auditorium": "Auditorium 1",
       "capacity": 75,
+      "tickets_sold": 1
+    },
+    {
+      "id": 4,
+      "movie_id": 1,
+      "start_time": "2026-03-25T14:30:00",
+      "end_time": "2026-03-25T16:30:00",
+      "auditorium": "Auditorium 2",
+      "capacity": 75,
+      "tickets_sold": 1
+    },
+    {
+      "id": 5,
+      "movie_id": 1,
+      "start_time": "2026-04-09T14:30:00",
+      "end_time": "2026-04-09T16:30:00",
+      "auditorium": "Auditorium 3",
+      "capacity": 75,
+      "tickets_sold": 1
+    },
+    {
+      "id": 6,
+      "movie_id": 3,
+      "start_time": "2026-03-27T14:30:00",
+      "end_time": "2026-03-27T16:30:00",
+      "auditorium": "Auditorium 1",
+      "capacity": 75,
+      "tickets_sold": 1
+    },
+    {
+      "id": 7,
+      "movie_id": 2,
+      "start_time": "2026-04-09T22:45:00",
+      "end_time": "2026-04-10T02:45:00",
+      "auditorium": "Auditorium 1",
+      "capacity": 75,
+      "tickets_sold": 75
+    },
+    {
+      "id": 8,
+      "movie_id": 4,
+      "start_time": "2026-04-17T16:45:00",
+      "end_time": "2026-04-17T18:45:00",
+      "auditorium": "Auditorium 4",
+      "capacity": 75,
       "tickets_sold": 0
+    },
+    {
+      "id": 9,
+      "movie_id": 6,
+      "start_time": "2026-05-13T13:24:00",
+      "end_time": "2026-05-13T14:51:00",
+      "auditorium": "Auditorium 3",
+      "capacity": 75,
+      "tickets_sold": 1
     }
   ],
   "movies": [
@@ -24,7 +78,42 @@
       "duration_min": 240,
       "rating": "PG-13",
       "description": ""
+    },
+    {
+      "id": 3,
+      "title": "Anaconda",
+      "duration_min": 120,
+      "rating": "R",
+      "description": ""
+    },
+    {
+      "id": 4,
+      "title": "Scream 7",
+      "duration_min": 120,
+      "rating": "R",
+      "description": "aaa"
+    },
+    {
+      "id": 5,
+      "title": "Hoppers",
+      "duration_min": 140,
+      "rating": "PG",
+      "description": "A little girls journey to saving a pond"
+    },
+    {
+      "id": 6,
+      "title": "The SpongeBob SquarePants Movie",
+      "duration_min": 87,
+      "rating": "PG",
+      "description": "SpongeBob and Patrick venture out towards Shell City, where they hope to find Neptune's crown."
+    },
+    {
+      "id": 7,
+      "title": "Sonic the Hedgehog 3",
+      "duration_min": 110,
+      "rating": "PG",
+      "description": "Sonic, Tails, and Knuckles face Shadow the Hedgehog, who allies with the mad scientists Ivo and Gerald Robotnik to pursue revenge against humanity."
     }
   ],
-  "next_id": 4
+  "next_id": 10
 }

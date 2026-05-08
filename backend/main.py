@@ -36,12 +36,33 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # In-memory repository that is synchronized with disk persistence.
 STORE = {
     "movies": [],
     "showtimes": [],
     "next_id": 1,
 }
+
+# Sales log file
+SALES_FILE = Path(__file__).resolve().parent / "sales.json"
+
+def load_sales():
+    if SALES_FILE.exists():
+        with open(SALES_FILE, "r") as f:
+            return json.load(f)
+    return []
+
+def save_sales(sales):
+    with open(SALES_FILE, "w") as f:
+        json.dump(sales, f, indent=2)
+
+def generate_confirmation_code(existing_codes):
+    import secrets, string
+    while True:
+        code = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(8))
+        if code not in existing_codes:
+            return code
 
 # Default folder for local persistence and existing behavior compatibility.
 DATA_DIR = Path(__file__).resolve().parent.parent / "frontend" / "public"
@@ -303,6 +324,7 @@ def add_showtime(showtime: ShowtimeCreate):
     return showtime_response(resp)
 
 
+
 @app.post("/api/showtimes/{showtime_id}/sell-ticket")
 def sell_ticket(showtime_id: int, req: SellTicketRequest) -> dict:
     show = next((s for s in STORE["showtimes"] if s["id"] == showtime_id), None)
@@ -315,10 +337,25 @@ def sell_ticket(showtime_id: int, req: SellTicketRequest) -> dict:
 
     show["tickets_sold"] += req.qty
     save_persistent_store()
+
+    # Record sale in sales log
+    sales = load_sales()
+    existing_codes = {sale["confirmation_code"] for sale in sales}
+    confirmation_code = generate_confirmation_code(existing_codes)
+    sale_record = {
+        "showtime_id": showtime_id,
+        "qty": req.qty,
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "confirmation_code": confirmation_code,
+    }
+    sales.append(sale_record)
+    save_sales(sales)
+
     return {
         "message": f"Sold {req.qty} ticket(s)",
         "tickets_sold": show["tickets_sold"],
         "seats_left": show["capacity"] - show["tickets_sold"],
+        "confirmation_code": confirmation_code,
     }
 
 
