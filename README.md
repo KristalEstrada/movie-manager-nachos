@@ -103,6 +103,7 @@ python main.py
 
 The Movie Manager system will launch in the terminal.  
 Users will be able to schedule and manage movie showtimes through the command-line interface.
+When accessing the frontend address, the user can choose between three access views, two of which need a password: Customer View, Employee View (PW: 'BestEmployeeEver') or Manager View (PW: 'nachos-123').
 
 ---
 

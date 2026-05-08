@@ -8,7 +8,27 @@ function fmtDate(iso) {
   return new Date(iso).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })
 }
 
-function ShowtimeCard({ showtime, onTicketSold, canDelete }) {
+function MovieDetailModal({ movie, onClose }) { // To show movie details to customers when a movie is clicked
+  return (
+    <div style={modalStyles.overlay}>
+      <div style={modalStyles.modal}>
+        <div style={modalStyles.header}>
+          <h2 style={modalStyles.title}>{movie.title}</h2>
+          <button onClick={onClose} style={modalStyles.closeBtn}>✕</button>
+        </div>
+        <div style={modalStyles.content}>
+          <div style={modalStyles.meta}>
+            <span className="tag rating">{movie.rating}</span>
+            <span style={modalStyles.duration}>{movie.duration_min} minutes</span>
+          </div>
+          <p style={modalStyles.description}>{movie.description}</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ShowtimeCard({ showtime, onTicketSold, canDelete, onMovieClick }) {
     const [deleting, setDeleting] = useState(false)
     async function handleDelete() {
       if (!window.confirm('Delete this showtime?')) return;
@@ -48,7 +68,12 @@ function ShowtimeCard({ showtime, onTicketSold, canDelete }) {
     <div style={styles.card}>
       {/* Movie title + rating */}
       <div style={styles.cardHeader}>
-        <span style={styles.movieTitle}>{showtime.movie.title}</span>
+        <span 
+          style={{ ...styles.movieTitle, cursor: 'pointer' }} // related to the movie detail modal. makes title clickable
+          onClick={() => onMovieClick && onMovieClick(showtime.movie)}
+        >
+          {showtime.movie.title}
+        </span>
         <span className="tag rating">{showtime.movie.rating}</span>
         {canDelete && (
           <button onClick={handleDelete} disabled={deleting} style={{ background: 'none', border: 'none', color: '#ff4f4f', fontWeight: 700, cursor: 'pointer', fontSize: 16 }} title="Delete showtime">✖</button>
@@ -103,6 +128,7 @@ function ShowtimeCard({ showtime, onTicketSold, canDelete }) {
 export default function ScheduleView({ showtimes, onRefresh, canSell = true, canDelete = false }) {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedAuditorium, setSelectedAuditorium] = useState('');
+  const [selectedMovie, setSelectedMovie] = useState(null);
 
   // Sort showtimes by start_time
   const sortedShowtimes = [...showtimes].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
@@ -175,11 +201,17 @@ export default function ScheduleView({ showtimes, onRefresh, canSell = true, can
           <p style={styles.dateLabel}>{fmtDate(shows[0].start_time)}</p>
           <div style={styles.cards}>
             {shows.map((s) => (
-              <ShowtimeCard key={s.id} showtime={s} onTicketSold={onRefresh} canDelete={canDelete} />
+              <ShowtimeCard key={s.id} showtime={s} onTicketSold={onRefresh} canDelete={canDelete} onMovieClick={setSelectedMovie} />
             ))}
           </div>
         </div>
       ))}
+      {selectedMovie && (
+        <MovieDetailModal 
+          movie={selectedMovie} 
+          onClose={() => setSelectedMovie(null)} 
+        />
+      )}
     </div>
   );
 }
@@ -236,5 +268,67 @@ const styles = {
     padding: '6px 10px',
     fontWeight: 600,
     fontSize: 13,
+  },
+}
+
+const modalStyles = {
+  overlay: {
+    position: 'fixed', 
+    inset: 0, 
+    background: 'rgba(0,0,0,.75)',
+    display: 'flex', 
+    alignItems: 'center', 
+    justifyContent: 'center',
+    zIndex: 1000,
+  },
+  modal: {
+    background: '#161616', 
+    border: '1px solid #2a2a2a',
+    borderRadius: 12, 
+    padding: 28, 
+    width: 460, 
+    maxWidth: '95vw',
+  },
+  header: { 
+    display: 'flex', 
+    justifyContent: 'space-between', 
+    alignItems: 'flex-start', 
+    marginBottom: 16 
+  },
+  title: { 
+    fontFamily: 'var(--font-display)', 
+    fontSize: 28, 
+    letterSpacing: '.06em', 
+    color: '#f5c518',
+    margin: 0,
+  },
+  closeBtn: {
+    background: 'transparent', 
+    color: '#7a7a7a', 
+    fontSize: 18,
+    padding: '2px 6px', 
+    border: '1px solid #2a2a2a', 
+    borderRadius: 6,
+    cursor: 'pointer',
+  },
+  content: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 16,
+  },
+  meta: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+  },
+  duration: {
+    fontSize: 14,
+    color: '#7a7a7a',
+  },
+  description: {
+    fontSize: 16,
+    color: '#e8e8e8',
+    lineHeight: 1.5,
+    margin: 0,
   },
 }
