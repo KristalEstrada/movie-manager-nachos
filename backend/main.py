@@ -8,6 +8,9 @@ from typing import List, Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from backend.database import initialize_database
+from backend.concessions import ConcessionItem, create_concession_item, get_concession_items, delete_concession_item
+
 
 app = FastAPI(title="Nachos Movie Manager API")
 @app.delete("/api/movies/{movie_id}")
@@ -184,6 +187,8 @@ def save_persistent_store() -> None:
 @app.on_event("startup")
 def app_startup() -> None:
     load_persistent_store()
+    initialize_database()
+
 
 
 @app.get("/api/schedule")
@@ -373,3 +378,17 @@ def fastapi_error_response(status_code: int, detail: str):
 @app.get("/")
 def root() -> dict:
     return {"message": "Nachos Movie Manager API is running"}
+@app.get("/api/concessions")
+def read_concessions():
+    return get_concession_items()
+
+
+@app.post("/api/concessions")
+def add_concession(item: ConcessionItem):
+    return create_concession_item(item)
+
+@app.delete("/api/concessions/{item_id}")
+def delete_concession(item_id: int):
+    return delete_concession_item(item_id)
+        
+    
