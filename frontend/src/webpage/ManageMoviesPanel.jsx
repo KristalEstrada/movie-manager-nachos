@@ -61,7 +61,7 @@ export default function ManageMoviesPanel({ onChanged }) {
       setAdding(false)
     }
   }
-
+  
   return (
     <div style={styles.panel}>
       <h2 style={styles.panelTitle}>🎞 Movies</h2>
@@ -102,7 +102,6 @@ export default function ManageMoviesPanel({ onChanged }) {
         <ul style={{ listStyle: 'none', padding: 0 }}>
           {movies.map(m => (
             <li key={m.id} style={styles.movieRow}>
-              <span style={styles.movieTitle}>{m.title}</span>
               <span style={styles.movieMeta}>{m.duration_min} min, {m.rating}</span>
               <button
                 style={styles.deleteBtn}

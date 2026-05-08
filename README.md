@@ -103,6 +103,7 @@ python main.py
 
 The Movie Manager system will launch in the terminal.  
 Users will be able to schedule and manage movie showtimes through the command-line interface.
+When accessing the frontend address, the user can choose between three access views, two of which need a password: Customer View, Employee View (PW: 'BestEmployeeEver') or Manager View (PW: 'nachos-123').
 
 ---
 
@@ -120,43 +121,41 @@ Cleaned project structure for running a FastAPI backend and a React + Vite front
 ```text
 movie-manager-nachos-fixed/
 ├── backend/
-│   ├── __init__.py
-│   └── main.py
-├── data/
 ├── frontend/
-│   ├── index.html
-│   ├── package.json
-│   ├── package-lock.json
-│   ├── vite.config.js
-│   └── src/
+├── data/
 ├── requirements.txt
 └── .gitignore
-```
 
-## Backend setup
+Step-by-Step Instructions to Run the Project
 
-From the project root:
-
-```bash
+Clone the repository
+git clone <your-repository-url>
+cd movie-manager-nachos
+Create a virtual environment
 python3 -m venv .venv
+Activate the virtual environment
+
+Mac/Linux:
 source .venv/bin/activate
+
+Windows:
+.venv\Scripts\activate
+
+Install backend dependencies
 pip install -r requirements.txt
-python -m uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
-```
+Start the backend server
+python -m uvicorn backend.main:app --reload --host localhost --port 8000
 
-If port 8000 is already in use, either stop the other process or run the backend on a different port:
+Backend will run at:
+http://localhost:8000
 
-```bash
-python -m uvicorn backend.main:app --reload --host 127.0.0.1 --port 8001
-```
-
-## Frontend setup
-
-Open a second terminal:
-
-```bash
+Open a second terminal
+Keep the backend running. Open a new terminal for the frontend.
+Navigate to the frontend folder
 cd frontend
+Install frontend dependencies
 npm install
+Start the frontend
 npm run dev
 ```
 
@@ -183,5 +182,4 @@ VITE_API_PROXY_TARGET=http://127.0.0.1:8001 npm run dev
 - `.DS_Store`
 - `__MACOSX`
 - invalid `python 3.14` line from `requirements.txt`
- ebd7797 (Set up React Vite frontend with Python backend integration)
-dev
+>>>>>>> ebd7797 (Set up React Vite frontend with Python backend integration)
