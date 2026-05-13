@@ -1,0 +1,130 @@
+{
+  "showtimes": [
+    {
+      "id": 3,
+      "movie_id": 1,
+      "start_time": "2026-03-25T10:00:00",
+      "end_time": "2026-03-25T12:00:00",
+      "auditorium": "Auditorium 1",
+      "capacity": 75,
+      "tickets_sold": 1
+    },
+    {
+      "id": 4,
+      "movie_id": 1,
+      "start_time": "2026-03-25T14:30:00",
+      "end_time": "2026-03-25T16:30:00",
+      "auditorium": "Auditorium 2",
+      "capacity": 75,
+      "tickets_sold": 1
+    },
+    {
+      "id": 5,
+      "movie_id": 1,
+      "start_time": "2026-04-09T14:30:00",
+      "end_time": "2026-04-09T16:30:00",
+      "auditorium": "Auditorium 3",
+      "capacity": 75,
+      "tickets_sold": 1
+    },
+    {
+      "id": 6,
+      "movie_id": 3,
+      "start_time": "2026-03-27T14:30:00",
+      "end_time": "2026-03-27T16:30:00",
+      "auditorium": "Auditorium 1",
+      "capacity": 75,
+      "tickets_sold": 11
+    },
+    {
+      "id": 7,
+      "movie_id": 2,
+      "start_time": "2026-04-09T22:45:00",
+      "end_time": "2026-04-10T02:45:00",
+      "auditorium": "Auditorium 1",
+      "capacity": 75,
+      "tickets_sold": 75
+    },
+    {
+      "id": 8,
+      "movie_id": 3,
+      "start_time": "2026-03-25T16:45:00",
+      "end_time": "2026-03-25T18:45:00",
+      "auditorium": "Auditorium 1",
+      "capacity": 75,
+      "tickets_sold": 75
+    },
+    {
+      "id": 9,
+      "movie_id": 3,
+      "start_time": "2026-03-25T10:00:00",
+      "end_time": "2026-03-25T12:00:00",
+      "auditorium": "Auditorium 2",
+      "capacity": 75,
+      "tickets_sold": 0
+    },
+    {
+      "id": 10,
+      "movie_id": 1,
+      "start_time": "2026-04-15T12:15:00",
+      "end_time": "2026-04-15T14:15:00",
+      "auditorium": "Auditorium 7",
+      "capacity": 75,
+      "tickets_sold": 5
+    },
+    {
+      "id": 11,
+      "movie_id": 5,
+      "start_time": "2026-04-14T17:45:00",
+      "end_time": "2026-04-14T20:05:00",
+      "auditorium": "Auditorium 1",
+      "capacity": 75,
+      "tickets_sold": 2
+    }
+  ],
+  "movies": [
+    {
+      "id": 1,
+      "title": "Spider Man 3",
+      "duration_min": 120,
+      "rating": "R",
+      "description": "a"
+    },
+    {
+      "id": 2,
+      "title": "Avatar",
+      "duration_min": 240,
+      "rating": "PG-13",
+      "description": ""
+    },
+    {
+      "id": 3,
+      "title": "Anaconda",
+      "duration_min": 120,
+      "rating": "R",
+      "description": ""
+    },
+    {
+      "id": 4,
+      "title": "Scream 7",
+      "duration_min": 120,
+      "rating": "R",
+      "description": "aaa"
+    },
+    {
+      "id": 5,
+      "title": "Hoppers",
+      "duration_min": 140,
+      "rating": "PG",
+      "description": "A little girls journey to saving a pond"
+    },
+    {
+      "id": 6,
+      "title": "test",
+      "duration_min": 22,
+      "rating": "NR",
+      "description": ""
+    }
+  ],
+  "next_id": 12
+}
